@@ -43,7 +43,7 @@ async def on_message(message):
     # 4) "Gogeta" trigger
     if "futile" in content:
         await message.reply("ITS FUTILE!")
-        await message.reply(file=discord.File("/videos/Gogeta Status. [Green Screen] - NotANamekian (1080p, h264).mp4"))
+        await message.reply(file=discord.File("videos/Gogeta Status. [Green Screen] - NotANamekian (1080p, h264).mp4"))
     
     # 5) "Zamasu" trigger
     if "pure" in content:
@@ -54,16 +54,16 @@ async def on_message(message):
         
     # 6) "Trunks" trigger
     if "android" in content:
-        await message.reply(file=discord.File("/videos/If They Set That Android Free It Will Be The End Of All Of Us - Trunks Loses It - DBZ Dragon Ball Z - DBZMusicFanHD (360p, h264).mp4"))    
+        await message.reply(file=discord.File("videos/If They Set That Android Free It Will Be The End Of All Of Us - Trunks Loses It - DBZ Dragon Ball Z - DBZMusicFanHD (360p, h264).mp4"))    
     
     if "future" in content:
-        await message.reply(file=discord.File("/videos/＂THIS IS FOR GOHAN!＂ - LAiB_Gaming (1080p, h264) (online-video-cutter.com)(1).mp4"))
+        await message.reply(file=discord.File("videos/＂THIS IS FOR GOHAN!＂ - LAiB_Gaming (1080p, h264) (online-video-cutter.com)(1).mp4"))
     
     # 7) "Piccolo" trigger
     if "win" in content:
         await message.reply("# **I CAN WIN. I FEEL GREAT. I. CAN. DO. THIS.**")
         asyncio.sleep(1)
-        await message.reply(file=discord.File("/videos/I FEEL GREAT. I CAN WIN. I. CAN. DO. THIS. - mattheavel (480p, h264) (online-video-cutter.com).mp4"))
+        await message.reply(file=discord.File("videos/I FEEL GREAT. I CAN WIN. I. CAN. DO. THIS. - mattheavel (480p, h264) (online-video-cutter.com).mp4"))
     
     # Finally, allow other commands to run
     await bot.process_commands(message)
