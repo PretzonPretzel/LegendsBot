@@ -12,10 +12,13 @@ intents.members = True  # Enable member intent for member-related commands
 
 bot = commands.Bot(intents=intents)
 
+class Client(discord.Client):
+    async def on_message(self, message):
+        if message.content.contains("Limits") or message.content.contains("limits"):
+            await self.reply(f"WE SAIYANS HAVE NO LIMITS!")
+            time.sleep(1)
+            await self.reply("LETS CHARGE TOGETHER AT FULL POWER.")
+            await self.reply("https://tenor.com/view/we-saiyans-have-no-limits-dokkan-dragon-ball-super-goku-vegeta-gif-3202169445918711234")
 
-async def on_message(self, message):
-    if message.content.contains("Limits") or message.content.contains("limits"):
-        await self.reply(f"WE SAIYANS HAVE NO LIMITS!")
-        time.sleep(1)
-        await self.reply("LETS CHARGE TOGETHER AT FULL POWER.")
-        await self.reply("https://tenor.com/view/we-saiyans-have-no-limits-dokkan-dragon-ball-super-goku-vegeta-gif-3202169445918711234")
+client = Client(intents=intents)
+client.run(token)
