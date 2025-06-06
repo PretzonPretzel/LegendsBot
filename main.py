@@ -3,6 +3,7 @@ from discord.ext import commands
 import os
 from dotenv import load_dotenv
 import asyncio  # for non-blocking sleeps
+import webserver
 
 load_dotenv()
 token = os.getenv("DISCORD_TOKEN")
@@ -68,4 +69,5 @@ async def on_message(message):
     # Finally, allow other commands to run
     await bot.process_commands(message)
 
+webserver.keep_alive()  # Start the web server to keep the bot alive
 bot.run(token)
