@@ -33,8 +33,8 @@ async def memes_disable(ctx):
 
 @bot.command(name="sick_em", help="Sick him, bot!")
 async def sick_him(ctx):
-    await ctx.message("BARK BARK BARK")
-    await ctx.message("https://media1.tenor.com/m/aov_xL6kxk8AAAAC/girl-jumping-around-like-a-wolf.gif")
+    await ctx.send("BARK BARK BARK")
+    await ctx.send("https://tenor.com/view/girl-jumping-around-like-a-wolf-gif-26759976")
 
 @bot.event
 async def on_message(message):
