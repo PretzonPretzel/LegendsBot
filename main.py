@@ -31,6 +31,10 @@ async def memes_disable(ctx):
     memes = False
     await ctx.reply("Chat reactions DISABLED 👎")
 
+@bot.command(name="sick_em", help="Sick him, bot!")
+async def sick_him(ctx):
+    await ctx.message("BARK BARK BARK")
+    await ctx.message("https://media1.tenor.com/m/aov_xL6kxk8AAAAC/girl-jumping-around-like-a-wolf.gif")
 
 @bot.event
 async def on_message(message):
