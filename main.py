@@ -181,8 +181,9 @@ async def fuck_em(ctx, member: commands.MemberConverter):
             await gifMsg.edit(content="https://media.discordapp.net/attachments/1380198124081119435/1381660257230786711/goku-genkidama.gif?ex=684852e3&is=68470163&hm=91f1531f694f51aee054aed5592a263f68604bef666930af08ad9bb0596ccba6&=&width=746&height=562")
 
     elif attack == 11: #rasengan attack
-        
-
+        await ctx.send(f"# **Rasengan!**")
+        await asyncio.sleep(0.5)
+        await ctx.send("https://media.discordapp.net/attachments/1380198124081119435/1381658129766289539/minato.gif?ex=684850e8&is=6846ff68&hm=c29b72691cfe8e4914d105998b3dd1da8f22b80cbe5d14608949c15eadf5d0c0&=&width=996&height=592")
 
 
 
