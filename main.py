@@ -15,7 +15,7 @@ intents.members = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-memes = False #CHANGE TO TRUE AFTER DEBUGGING ATTACKS
+memes = True
 
 @bot.command(name="ping", help="Ping the bot, ensuring it's alive")
 async def ping(ctx):
@@ -322,5 +322,5 @@ async def on_message(message):
         await message.reply(file=discord.File("videos/I FEEL GREAT. I CAN WIN. I. CAN. DO. THIS. - mattheavel (480p, h264) (online-video-cutter.com).mp4"))
     
 
-# webserver.keep_alive()  # Start the web server to keep the bot alive
+webserver.keep_alive()  # Start the web server to keep the bot alive
 bot.run(token)
