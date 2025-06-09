@@ -40,8 +40,7 @@ async def sick_him(ctx):
 
 @bot.command(name="fuck_em", help="Kills whomever you want")
 async def fuck_em(ctx, member: commands.MemberConverter):
-    #attack = random.randint(1, 16)
-    attack = 13
+    attack = random.randint(1, 15)
     fucker = ctx.author.display_name
     fuckee = member.display_name
     
@@ -124,7 +123,7 @@ async def fuck_em(ctx, member: commands.MemberConverter):
 
     elif attack == 7: #serious series attack
         series = random.randint(1,2)
-        await ctx.send(f"Serious serious...")
+        await ctx.send(f"Serious series...")
         await asyncio.sleep(1.2)
         if series == 1:
             await ctx.send(f"# **Serious Punch**")
@@ -200,7 +199,7 @@ async def fuck_em(ctx, member: commands.MemberConverter):
         await asyncio.sleep(1.5)
         await ctx.send(f"STILL HAVING FUN?")
         await asyncio.sleep(1.3)
-        await ctx.send(f"ANSWER ME!")
+        await ctx.send(f"**ANSWER ME!**")
         await asyncio.sleep(1.2)
 
         webhooks = await ctx.channel.webhooks()
@@ -209,7 +208,7 @@ async def fuck_em(ctx, member: commands.MemberConverter):
             webhook = await ctx.channel.create_webhook(name="Impersonator")
             
         await webhook.send(
-            content="I take the good with the bad",
+            content="I take the good with the bad.",
             username=member.display_name,
             avatar_url=member.display_avatar.url
         )
@@ -223,6 +222,50 @@ async def fuck_em(ctx, member: commands.MemberConverter):
         elif titlecard == 2:
             await ctx.send("https://preview.redd.it/characters-using-their-head-btw-congrats-to-the-sub-for-100k-v0-fvupe2avvgoe1.gif?width=640&crop=smart&auto=webp&s=0d80ce208df2ed15738d51a91211ac9e71b61894")
         
+    elif attack == 14: #bat lol
+        await ctx.send(f"https://tenor.com/view/the-shusher-bat-staff-rod-gif-8855179341029231927")
+        await ctx.send("https://youtu.be/f8mL0_4GeV0?si=r5U5AsQ74Mv4M5ZK")
+
+    elif attack == 15: #failure
+        webhooks = await ctx.channel.webhooks()
+        webhook = discord.utils.get(webhooks, name="Impersonator")
+        if webhook is None:
+            webhook = await ctx.channel.create_webhook(name="Impersonator")
+        
+        await webhook.send(
+            content=f"Wha- What the?!",
+            username=ctx.author.display_name,
+            avatar_url=ctx.author.display_avatar.url
+        )
+        await asyncio.sleep(0.2)
+        await webhook.send(
+            content=f"https://i.makeagif.com/media/1-28-2019/P8wA11.gif",
+            username=ctx.author.display_name,
+            avatar_url=ctx.author.display_avatar.url
+        )
+        
+        await asyncio.sleep(1.5)
+        await webhook.send(
+            content=f"Now what was that supposed to be, {fucker}?",
+            username=member.display_name,
+            avatar_url=member.display_avatar.url
+        )
+        await asyncio.sleep(0.9)
+        await webhook.send(
+            content=f"https://media.discordapp.net/attachments/1380188830753362063/1381724686966198423/broly-goku.gif?ex=68488ee4&is=68473d64&hm=805aa23a2012f24a5a390f2e767d42926553893612980c409e55f8b4e2647f19&=&width=1280&height=892",
+            username=member.display_name,
+            avatar_url=member.display_avatar.url
+        )
+        
+        await asyncio.sleep(1.5)
+        await webhook.send(
+            content=f"https://media.discordapp.net/attachments/1380188830753362063/1381724687528230972/broly-vs-goku-broly.gif?ex=68488ee4&is=68473d64&hm=1724cdfeaa0917d6977c38659256396cf0be0658666e16866675ef6a83e35439&=&width=996&height=926",
+            username=member.display_name,
+            avatar_url=member.display_avatar.url
+        )
+
+        await webhook.delete()
+
 
 @bot.event
 async def on_message(message):
