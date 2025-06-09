@@ -13,16 +13,36 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
+memes = True
+
 @bot.command(name="ping", help="Ping the bot, ensuring it's alive")
 async def ping(ctx):
     await ctx.reply("KAMEHAMEHA! Pong :3c")
+
+@bot.command(name="memes-enable", help="Turn chat reactions ON")
+async def memes_enable(ctx):
+    global memes
+    memes = True
+    await ctx.reply("Chat reactions ENABLED 👍")
+
+@bot.command(name="memes-disable", help="Turn chat reactions OFF")
+async def memes_disable(ctx):
+    global memes
+    memes = False
+    await ctx.reply("Chat reactions DISABLED 👎")
+
 
 @bot.event
 async def on_message(message):
     # 1) Ignore bots (including yourself)
     if message.author.bot:
         return
-
+    
+    await bot.process_commands(message)
+    
+    if memes == False:
+        return
+    
     content = message.content.lower()
 
     # 2) "limits" trigger
@@ -66,8 +86,6 @@ async def on_message(message):
         asyncio.sleep(1)
         await message.reply(file=discord.File("videos/I FEEL GREAT. I CAN WIN. I. CAN. DO. THIS. - mattheavel (480p, h264) (online-video-cutter.com).mp4"))
     
-    # Finally, allow other commands to run
-    await bot.process_commands(message)
 
 webserver.keep_alive()  # Start the web server to keep the bot alive
 bot.run(token)
