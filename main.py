@@ -40,8 +40,8 @@ async def sick_him(ctx):
 
 @bot.command(name="fuck_em", help="Kills whomever you want")
 async def fuck_em(ctx, member: commands.MemberConverter):
-    #attack = random.randint(1, 17)
-    attack = 9
+    #attack = random.randint(1, 16)
+    attack = 13
     fucker = ctx.author.display_name
     fuckee = member.display_name
     
@@ -185,8 +185,44 @@ async def fuck_em(ctx, member: commands.MemberConverter):
         await asyncio.sleep(0.5)
         await ctx.send("https://media.discordapp.net/attachments/1380198124081119435/1381658129766289539/minato.gif?ex=684850e8&is=6846ff68&hm=c29b72691cfe8e4914d105998b3dd1da8f22b80cbe5d14608949c15eadf5d0c0&=&width=996&height=592")
 
+    elif attack == 12: #getsuga attack
+        await ctx.send(f"Getsuga....")
+        await asyncio.sleep(0.9)
+        await ctx.send(f"# **Tensho!**")
+        await asyncio.sleep(0.5)
+        await ctx.send("https://cdn.discordapp.com/attachments/1380198124081119435/1381659616487804988/ichigo-kurosaki-ichigo.gif?ex=6848524a&is=684700ca&hm=41538f4748df2d9b2188b9adaace917476e11f8e1fdbd18a887e55e5178a2b6e&")
 
+    elif attack == 13: #invincible beatdown
+        titlecard = random.randint(1,2)
+        await ctx.send(f"Is this what you wanted, {fuckee}?")
+        await asyncio.sleep(1)
+        await ctx.send(f"You enjoy yourself?")
+        await asyncio.sleep(1.5)
+        await ctx.send(f"STILL HAVING FUN?")
+        await asyncio.sleep(1.3)
+        await ctx.send(f"ANSWER ME!")
+        await asyncio.sleep(1.2)
 
+        webhooks = await ctx.channel.webhooks()
+        webhook = discord.utils.get(webhooks, name="Impersonator")
+        if webhook is None:
+            webhook = await ctx.channel.create_webhook(name="Impersonator")
+            
+        await webhook.send(
+            content="I take the good with the bad",
+            username=member.display_name,
+            avatar_url=member.display_avatar.url
+        )
+        await webhook.delete()
+        
+        await asyncio.sleep(1.5)
+        await ctx.send("# **GRAAAAAAHHHHHH**")
+        await asyncio.sleep(0.5)
+        if titlecard == 1:
+            await ctx.send("https://media.discordapp.net/attachments/1380198124081119435/1381656268032315533/invincible-punch-invincible.gif?ex=68484f2c&is=6846fdac&hm=7ffef3dccbe7001154d01007ad17cf29b1f245770091690f8c2e119a5c1be711&=&width=996&height=562")
+        elif titlecard == 2:
+            await ctx.send("https://preview.redd.it/characters-using-their-head-btw-congrats-to-the-sub-for-100k-v0-fvupe2avvgoe1.gif?width=640&crop=smart&auto=webp&s=0d80ce208df2ed15738d51a91211ac9e71b61894")
+        
 
 @bot.event
 async def on_message(message):
