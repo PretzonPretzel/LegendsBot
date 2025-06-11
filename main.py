@@ -38,7 +38,7 @@ async def sick_him(ctx):
     await ctx.send("BARK BARK BARK")
     await ctx.send("https://tenor.com/view/girl-jumping-around-like-a-wolf-gif-26759976")
 
-@bot.command(name="fuck_em", help="Kills whomever you want")
+@bot.command(name="fuckem", help="Kills whomever you want")
 async def fuck_em(ctx, member: commands.MemberConverter):
     attack = random.randint(1, 15)
     fucker = ctx.author.display_name
