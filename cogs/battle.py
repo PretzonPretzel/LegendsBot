@@ -1,45 +1,380 @@
-import os
+# battle.py
 import random
-from discord.ext import commands
-from discord import Embed
 import discord
+from discord.ext import commands
+import asyncio
 
-
+# ─── Player ───────────────────────────────────────────────────────────────────
 class Player:
-    def __init__(self, user):
-        self.user = user
-        self.hp = 100
-    
-    def take_damage(self, damage):
-        self.hp -= damage
-        
-class PVPBattle:
-    def __init__(self):
-        self.players = {}
-        
-    def add_player(self, player):
-        self.players[player.user.id] = player
-    
-    def get_player(self, user):
-        return self.players.get(user.id)
-    
-    def attack(self, attacker, target):
-        damage = 25
-        target.take_damage(damage)
-        
-        if target.health <= 0:
-            return f'{target.user.name} died!'
-        else:
-            return f'{attacker.user.name} attacked {target.user.name}! Health remaining: {target.health}'
+    def __init__(self, member: discord.Member):
+        self.member = member
+        self.hp     = 100
 
-game = PVPBattle()
+    @property
+    def name(self) -> str:
+        return self.member.display_name
 
+# ─── Session ──────────────────────────────────────────────────────────────────
+class Session:
+    def __init__(self, p1: Player, p2: Player, channel: discord.TextChannel):
+        self.fucker       = p1               # challenger
+        self.fucked       = p2               # challenged
+        self.turn         = p1               # who goes first
+        self.channel      = channel
+        self.in_progress  = False            # flips on Accept
+        self.pending_beam: tuple[Player, Attack] | None = None # Player who fired a beam last
+        self.pending_special: tuple[Player, Attack] | None = None
+        
+        
+    def other(self, player: Player) -> Player:
+        return self.fucked if player is self.fucker else self.fucker
 
+    def is_over(self) -> bool:
+        return self.fucker.hp <= 0 or self.fucked.hp <= 0
+
+    def winner(self) -> Player:
+        return self.fucker if self.fucked.hp <= 0 else self.fucked
+
+# ─── Attack Definitions ───────────────────────────────────────────────────────
+from enum import Enum, auto
+from dataclasses import dataclass
+
+class AttackType(Enum):
+    STRIKE   = auto()
+    BEAM     = auto()
+    SPECIAL  = auto()
+    INSTANT  = auto()
+    BACKFIRE = auto()
+
+@dataclass
+class Attack:
+    id:   int
+    name: str
+    type: AttackType
+
+# fill in your real names if you like
+ALL_ATTACKS = {
+    1:  Attack(1,  "Kamehameha",          AttackType.BEAM),
+    2:  Attack(2,  "Final Flash",         AttackType.BEAM),
+    3:  Attack(3,  "Invincible Beatdown", AttackType.STRIKE),
+    4:  Attack(4,  "I Am Atomic",         AttackType.SPECIAL),
+    5:  Attack(5,  "Spirit Bomb",         AttackType.BEAM),
+    6:  Attack(6,  "Black Flash",         AttackType.STRIKE),
+    7:  Attack(7,  "Serious Series",      AttackType.STRIKE),
+    8:  Attack(8,  "Hakai",               AttackType.INSTANT),
+    9:  Attack(9,  "Soul Punisher",       AttackType.INSTANT),
+   10:  Attack(10, "Rasengan",            AttackType.STRIKE),
+   11:  Attack(11, "Getsuga Tensho",      AttackType.BEAM),
+   12:  Attack(12, "Domain Expansion",    AttackType.SPECIAL),
+   13:  Attack(13, "Bat Whack",           AttackType.SPECIAL),
+   14:  Attack(14, "Broly Backfire",      AttackType.BACKFIRE),
+   15:  Attack(15, "Hollow Purple",       AttackType.BEAM),
+}
+
+# sets for quick type checks
+STRIKES   = {a.id for a in ALL_ATTACKS.values() if a.type is AttackType.STRIKE}
+BEAMS     = {a.id for a in ALL_ATTACKS.values() if a.type is AttackType.BEAM}
+SPECIALS  = {a.id for a in ALL_ATTACKS.values() if a.type is AttackType.SPECIAL}
+INSTANTS  = {a.id for a in ALL_ATTACKS.values() if a.type is AttackType.INSTANT}
+BACKFIRES = {a.id for a in ALL_ATTACKS.values() if a.type is AttackType.BACKFIRE}
+
+# ─── Challenge UI ─────────────────────────────────────────────────────────────
+class ChallengeView(discord.ui.View):
+    def __init__(self, session: Session, sessions: dict[int, Session]):
+        super().__init__(timeout=30.0)
+        self.session  = session
+        self.sessions = sessions
+        self.message: discord.Message | None = None
+
+    async def on_timeout(self):
+        if not self.session.in_progress:
+            await self.message.edit(
+                content="⏰ Challenge timed out—no one accepted!",
+                view=None
+            )
+            self.sessions.pop(self.session.channel.id, None)
+
+    @discord.ui.button(label="Accept", style=discord.ButtonStyle.success)
+    async def accept(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user != self.session.fucked.member:
+            return await interaction.response.send_message("You can’t accept this!", ephemeral=True)
+        self.session.in_progress = True
+        await interaction.response.edit_message(
+            content=(
+                f"⚔️ **Battle Start!**\n"
+                f"{self.session.fucker.name} vs {self.session.fucked.name}\n"
+                f"**{self.session.turn.name}** goes first—use `!roll`!"
+            ),
+            view=None
+        )
+
+    @discord.ui.button(label="Deny", style=discord.ButtonStyle.danger)
+    async def deny(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user != self.session.fucked.member:
+            return await interaction.response.send_message("You can’t deny this!", ephemeral=True)
+        insults = ["You a bitch fr.", "Coward.", "Pathetic.", "Filthy monkey...can't even fight back.", "Are you trembling?", "Too much of a power gap, huh?", "What's wrong? Feeling chickenshit?", "Oh. Well, since they declined & i have your attention, did you know that The FitnessGram Pacer Test is a multistage aerobic capacity test that progressively gets more difficult as it continues. The 20 meter pacer test will begin in 30 seconds. Line up at the start. The running speed starts slowly but gets faster each minute after you hear this signal bodeboop. A sing lap should be completed every time you hear this sound. ding. Remember to run in a straight line and run as long as possible. The second time you fail to complete a lap before the sound, your test is over. The test will begin on the word start. On your mark. Get ready!… Start! ding"]
+        await interaction.response.edit_message(
+            content=f"{interaction.user.mention} denies the fight. {random.choice(insults)}",
+            view=None
+        )
+        self.sessions.pop(self.session.channel.id, None)
+
+# ─── The Battle Cog ───────────────────────────────────────────────────────────
 class Battle(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
-    
-    
+        self.sessions: dict[int, Session] = {}
 
-async def setup(bot):
+    @commands.command(name="challenge", help="Invite someone to a 1v1 fight")
+    async def challenge(self, ctx, opponent: discord.Member):
+        if ctx.channel.id in self.sessions:
+            return await ctx.send("🚫 A battle is already in progress!")
+        if opponent == ctx.author:
+            return await ctx.send("You can’t battle yourself!")
+
+        p1 = Player(ctx.author)
+        p2 = Player(opponent)
+        session = Session(p1, p2, ctx.channel)
+        self.sessions[ctx.channel.id] = session
+
+        view = ChallengeView(session, self.sessions)
+        msg  = await ctx.send(
+            f"{opponent.mention}, you’ve been challenged by **{ctx.author.display_name}**! ",
+            view=view
+        )
+        view.message = msg
+
+    @commands.command(name="roll", help="Roll your attack")
+    async def roll(self, ctx):
+        session = self.sessions.get(ctx.channel.id)
+        if not session or not session.in_progress:
+            return await ctx.send("❓ No active fight to roll in.")
+        attacker = session.turn
+        if ctx.author != attacker.member:
+            return await ctx.send(f"⌛ Not your turn—it's {attacker.name}'s.")
+        
+        # **Prevent a new roll if you must stick/reroll a pending special**
+        if session.pending_special:
+            return await ctx.send(
+                f"🌀 You rolled a special earlier! "
+                "Type `!stick` to lock it in or `!reroll` to roll again."
+            )
+
+        # 1) pick your attack
+        attack_id = random.randint(1, 15)
+        atk       = ALL_ATTACKS[attack_id]
+        defender  = session.other(attacker)
+
+        # ── 1) BEAM ───────────────────────────────
+        if atk.type is AttackType.BEAM:
+            if session.pending_beam:
+                prev_player, prev_atk = session.pending_beam
+                # now we have two beams in play:
+                #   prev_player fired prev_atk, attacker just fired atk
+                winner = random.choice([prev_player, attacker])
+                loser  = session.other(winner)
+                loser.hp -= 25
+
+                await ctx.send(
+                    f"🔹 **{prev_player.name}** launched a **{prev_atk.name}**! \n"
+                    f"🔹 **{attacker.name}** launches **{atk.name}**!\n"
+                    f"💥 **Beam clash!** **{winner.name}** wins the coin flip; "
+                    f"{loser.name} loses 25 HP (now {loser.hp})."
+                )
+
+                session.pending_beam = None
+
+            else:
+                # first beam of the duel
+                session.pending_beam = (attacker, atk)
+                await ctx.send(
+                    f"🔹 **{attacker.name}** fires **{atk.name}** beam! "
+                    f"{defender.name}, roll to, hopefully, clash."
+                )
+
+        # ── 2) INSTANT KILL ────────────────────────
+        elif atk.type is AttackType.BACKFIRE:
+            # mark attacker dead
+            attacker.hp = 0
+
+            # grab Player objects
+            attacker_player = attacker
+            defender_player = session.other(attacker_player)
+
+            # grab the underlying discord.Member
+            author = attacker_player.member
+            victim  = defender_player.member
+
+            # get or create our “Impersonator” webhook
+            webhooks = await ctx.channel.webhooks()
+            webhook  = discord.utils.get(webhooks, name="Impersonator")
+            if webhook is None:
+                webhook = await ctx.channel.create_webhook(name="Impersonator")
+
+            # 1) Impersonate the attacker freaking out
+            await webhook.send(
+                content="Wha—What the?!",
+                username=author.display_name,
+                avatar_url=author.display_avatar.url
+            )
+            await asyncio.sleep(0.2)
+            await webhook.send(
+                content="https://i.makeagif.com/media/1-28-2019/P8wA11.gif",
+                username=author.display_name,
+                avatar_url=author.display_avatar.url
+            )
+
+            # 2) Then have the victim taunt back
+            await asyncio.sleep(1.5)
+            await webhook.send(
+                content=f"Now what was that supposed to be, {author.display_name}?",
+                username=victim.display_name,
+                avatar_url=victim.display_avatar.url
+            )
+            await asyncio.sleep(0.9)
+            await webhook.send(
+                content="https://media.discordapp.net/attachments/1380188830753362063/1381724686966198423/broly-goku.gif",
+                username=victim.display_name,
+                avatar_url=victim.display_avatar.url
+            )
+            await asyncio.sleep(1.5)
+            await webhook.send(
+                content="https://media.discordapp.net/attachments/1380188830753362063/1381724687528230972/broly-vs-goku-broly.gif",
+                username=victim.display_name,
+                avatar_url=victim.display_avatar.url
+            )
+
+            # clean up
+            await webhook.delete()
+
+            # finally post the outcome as the bot itself
+            await ctx.send(
+                f"🔥 **{author.display_name}** tried **{atk.name}** and it backfired! "
+                f"{author.display_name} is KO’d!"
+            )
+
+        # ── 4) STRIKES & SPECIALS ──────────────────
+        elif atk.type is AttackType.SPECIAL:
+        # beam vs special override
+            if session.pending_beam and attacker != session.pending_beam[0]:
+                beam_user, beam_atk = session.pending_beam
+                loser = session.other(beam_user)
+                loser.hp -= 25
+
+                # mention both moves by name
+                await ctx.send(
+                    f"🔹 **{beam_user.name}** launches **{beam_atk.name}** beam!\n"
+                    f"✨ **{attacker.name}** attempts **{atk.name}** special!\n"
+                    f"💥 **{beam_user.name}**’s **{beam_atk.name}** overwhelms "
+                    f"{attacker.name}’s **{atk.name}**! "
+                    f"{loser.name} loses 25 HP (now {loser.hp})."
+                )
+
+                session.pending_beam = None
+
+            else:
+                # no beam pending, treat as normal special prompt
+                session.pending_special = (attacker, atk)
+                await ctx.send(
+                    f"✨ **{attacker.name}** rolls **{atk.name}** special!\n"
+                    "Type `!stick` to lock it in for 25 HP or `!reroll` to try again."
+                )
+                return
+
+        # 5) STRIKE (fallback for non‐beam, non‐instant, non‐backfire, non‐special)
+        elif atk.type is AttackType.STRIKE:
+            # beam beats strike
+            if session.pending_beam and attacker != session.pending_beam[0]:
+                beam_user, beam_atk = session.pending_beam
+                loser = session.other(beam_user)
+                loser.hp -= 25
+
+                await ctx.send(
+                    f"🔹 **{beam_user.name}** launches **{beam_atk.name}** beam!\n"
+                    f"🔸 **{attacker.name}** attempts **{atk.name}** strike!\n"
+                    f"💥 **{beam_user.name}**’s **{beam_atk.name}** overwhelms "
+                    f"{attacker.name}’s **{atk.name}**! "
+                    f"{loser.name} loses 25 HP (now {loser.hp})."
+                )
+
+                session.pending_beam = None
+
+            else:
+                # normal strike
+                defender.hp -= 25
+                await ctx.send(
+                    f"🔸 **{attacker.name}** uses **{atk.name}** strike! "
+                    f"{defender.name} loses 25 HP (now {defender.hp})."
+                )
+
+        # ── 5) End‐of‐turn housekeeping ─────────────
+        # check for KO
+        if session.is_over():
+            winner = session.winner()
+            await ctx.send(f"🏆 **{winner.name}** wins the duel!")
+            del self.sessions[ctx.channel.id]
+            return
+
+        # swap turns
+        session.turn = defender
+        await ctx.send(f"🔄 Next: **{session.turn.name}** – type `!roll` or `!end`.")
+
+    @commands.command(name="stick", help="Lock in your special for 25 HP")
+    async def stick(self, ctx):
+        session = self.sessions.get(ctx.channel.id)
+        if not session or not session.in_progress:
+            return await ctx.send("❓ No fight here.")
+        if not session.pending_special:
+            return await ctx.send("❓ You have no special to lock in.")
+        
+        attacker, atk = session.pending_special
+        if ctx.author != attacker.member:
+            return await ctx.send("🚫 That’s not your special to stick!")
+
+        defender = session.other(attacker)
+        defender.hp -= 25
+        await ctx.send(
+            f"✨ **{attacker.name}** locks in **{atk.name}**! "
+            f"{defender.name} loses 25 HP (now {defender.hp})."
+        )
+
+        session.pending_special = None
+
+        if session.is_over():
+            winner = session.winner()
+            await ctx.send(f"🏆 **{winner.name}** wins the duel!")
+            del self.sessions[ctx.channel.id]
+            return
+
+        session.turn = defender
+        await ctx.send(f"🔄 Next: **{session.turn.name}** – type `!roll` or `!end`.")
+
+    @commands.command(name="reroll", help="Roll again for a different attack")
+    async def reroll(self, ctx):
+        session = self.sessions.get(ctx.channel.id)
+        if not session or not session.in_progress:
+            return await ctx.send("❓ No fight here.")
+        if not session.pending_special:
+            return await ctx.send("❓ You have no special to reroll.")
+        
+        attacker, _ = session.pending_special
+        if ctx.author != attacker.member:
+            return await ctx.send("🚫 That’s not your reroll to use!")
+
+        session.pending_special = None
+        await ctx.send(f"🔄 **{attacker.name}** rerolls their special!")
+        # re-invoke roll logic for you
+        await self.roll(ctx)
+
+    @commands.command(name="end", help="End the fight in a draw")
+    async def end(self, ctx):
+        session = self.sessions.get(ctx.channel.id)
+        if not session or not session.in_progress:
+            return await ctx.send("❓ No fight to end here.")
+        if ctx.author not in (session.fucker.member, session.fucked.member):
+            return await ctx.send("🚫 You’re not in this fight!")
+        await ctx.send("🤝 The fight ends in a draw.")
+        del self.sessions[ctx.channel.id]
+
+async def setup(bot: commands.Bot):
     await bot.add_cog(Battle(bot))
