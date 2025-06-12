@@ -15,7 +15,7 @@ intents.members = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-memes = True
+memes = False #CHANGE LATER TO TRUE TO ENABLE MEMES
 
 @bot.command(name="ping", help="Ping the bot, ensuring it's alive")
 async def ping(ctx):
@@ -321,6 +321,16 @@ async def on_message(message):
         asyncio.sleep(1)
         await message.reply(file=discord.File("videos/I FEEL GREAT. I CAN WIN. I. CAN. DO. THIS. - mattheavel (480p, h264) (online-video-cutter.com).mp4"))
     
+@bot.event
+async def Load():
+    for filename in os.listdir('./cogs'):
+        if filename.endswith('.py'):
+            await bot.load_extension(f'cogs.{filename[:-3]}')
+            
+async def main():
+    async with bot:
+        await Load()
+        # webserver.keep_alive()  # Start the web server to keep the bot alive
+        await bot.start(token)
 
-webserver.keep_alive()  # Start the web server to keep the bot alive
-bot.run(token)
+asyncio.run(main())
