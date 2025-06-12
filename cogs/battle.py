@@ -377,4 +377,5 @@ class Battle(commands.Cog):
         del self.sessions[ctx.channel.id]
 
 async def setup(bot: commands.Bot):
+    print("Loaded")
     await bot.add_cog(Battle(bot))

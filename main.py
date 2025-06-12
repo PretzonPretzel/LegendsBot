@@ -331,6 +331,7 @@ async def main():
     async with bot:
         await Load()
         #webserver.keep_alive()  # Start the web server to keep the bot alive
+        print("loading but main lol")
         await bot.start(token)
 
 asyncio.run(main())
