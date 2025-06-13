@@ -78,6 +78,42 @@ SPECIALS  = {a.id for a in ALL_ATTACKS.values() if a.type is AttackType.SPECIAL}
 INSTANTS  = {a.id for a in ALL_ATTACKS.values() if a.type is AttackType.INSTANT}
 BACKFIRES = {a.id for a in ALL_ATTACKS.values() if a.type is AttackType.BACKFIRE}
 
+STRIKE_ACTIONS: dict[int, dict[str, list[str] | str]] = {
+6: {  # Black Flash
+        "text": "The sparks of black do not choose who to bless, {target}.\n # **BLACK FLASH**",
+        "gifs": [
+            "https://cdn.discordapp.com/attachments/1380198124081119435/1381663696975298620/jjk-jjk-s2.gif?ex=68485617&is=68470497&hm=07986931101f68c41596588e08583f9a024d0231634c4f25a31b526cb8e7668f&",
+            "https://cdn.discordapp.com/attachments/1380198124081119435/1381663697444802714/jujutsu-kaisen-jujutsu-kaisen-season-2.gif?ex=68485617&is=68470497&hm=0859c4581e7fd576a70763a3b129bb554934c07750128f5991b68ec554ed4644&",
+            "https://media.discordapp.net/attachments/1380198124081119435/1381663697843392583/black-flash-jujutsu-kaisen.gif?ex=68485617&is=68470497&hm=67332fae0410cfd2a703abd0678425a7a308446e6ddfed0eaf7bbd0cd01eb6b0&=&width=1280&height=720",
+            "https://media.discordapp.net/attachments/1380198124081119435/1381663698162286693/jjk-jujutsu-kaisen_1.gif?ex=68485617&is=68470497&hm=74fd2c54cb1c809dd96a0219205e9d81c35f07e4a9b2ffbc784162a3c76bb15a&=&width=996&height=562",
+            "https://media.discordapp.net/attachments/1380198124081119435/1381663698682122512/jujutsu-kaisen-itadori-yuuji.gif?ex=68485617&is=68470497&hm=a3fc0b8ba474d780f59e7231347aed81855242d194ad1cb25ab690298b2b2b36&=&width=1280&height=852",
+            "https://media.discordapp.net/attachments/1380198124081119435/1381663699139559555/itadori-yuji-kugisaki-nobara.gif?ex=68485617&is=68470497&hm=714b38297bd84bed95394bf42c9ba49fdfcbb38cd2485150e2b738fbfcb01bb3&=&width=996&height=556"
+        ]
+    },
+    7: {  # Serious Series
+        "text": "Serious series… **SERIOUS PUNCH**",
+        "gifs": [
+            "https://media.discordapp.net/attachments/.../saitama-serious-vs.gif"
+        ]
+    },
+    10: {  # Rasengan
+        "text": "**RASENGAN!**",
+        "gifs": [
+            "https://media.discordapp.net/attachments/.../minato.gif"
+        ]
+    },
+    3: {  # Invincible Beatdown (just an example)
+        "text": "**INVINCIBLE BEATDOWN!**",
+        "gifs": [
+            "https://media.discordapp.net/attachments/.../invincible-punch-invincible.gif"
+        ]
+    },
+    # add more as you like…
+}
+
+
+
+
 # ─── Challenge UI ─────────────────────────────────────────────────────────────
 class ChallengeView(discord.ui.View):
     def __init__(self, session: Session, sessions: dict[int, Session]):
@@ -249,7 +285,7 @@ class Battle(commands.Cog):
 
             # finally post the outcome as the bot itself
             await ctx.send(
-                f"🔥 **{author.display_name}** tried **{atk.name}** and it backfired! "
+                f"🔥 **{author.display_name}** tried to attack but it backfired! "
                 f"{author.display_name} is KO’d!"
             )
 
