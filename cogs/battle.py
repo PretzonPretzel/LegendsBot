@@ -78,42 +78,6 @@ SPECIALS  = {a.id for a in ALL_ATTACKS.values() if a.type is AttackType.SPECIAL}
 INSTANTS  = {a.id for a in ALL_ATTACKS.values() if a.type is AttackType.INSTANT}
 BACKFIRES = {a.id for a in ALL_ATTACKS.values() if a.type is AttackType.BACKFIRE}
 
-STRIKE_ACTIONS: dict[int, dict[str, list[str] | str]] = {
-6: {  # Black Flash
-        "text": "The sparks of black do not choose who to bless, {target}.\n # **BLACK FLASH**",
-        "gifs": [
-            "https://cdn.discordapp.com/attachments/1380198124081119435/1381663696975298620/jjk-jjk-s2.gif?ex=68485617&is=68470497&hm=07986931101f68c41596588e08583f9a024d0231634c4f25a31b526cb8e7668f&",
-            "https://cdn.discordapp.com/attachments/1380198124081119435/1381663697444802714/jujutsu-kaisen-jujutsu-kaisen-season-2.gif?ex=68485617&is=68470497&hm=0859c4581e7fd576a70763a3b129bb554934c07750128f5991b68ec554ed4644&",
-            "https://media.discordapp.net/attachments/1380198124081119435/1381663697843392583/black-flash-jujutsu-kaisen.gif?ex=68485617&is=68470497&hm=67332fae0410cfd2a703abd0678425a7a308446e6ddfed0eaf7bbd0cd01eb6b0&=&width=1280&height=720",
-            "https://media.discordapp.net/attachments/1380198124081119435/1381663698162286693/jjk-jujutsu-kaisen_1.gif?ex=68485617&is=68470497&hm=74fd2c54cb1c809dd96a0219205e9d81c35f07e4a9b2ffbc784162a3c76bb15a&=&width=996&height=562",
-            "https://media.discordapp.net/attachments/1380198124081119435/1381663698682122512/jujutsu-kaisen-itadori-yuuji.gif?ex=68485617&is=68470497&hm=a3fc0b8ba474d780f59e7231347aed81855242d194ad1cb25ab690298b2b2b36&=&width=1280&height=852",
-            "https://media.discordapp.net/attachments/1380198124081119435/1381663699139559555/itadori-yuji-kugisaki-nobara.gif?ex=68485617&is=68470497&hm=714b38297bd84bed95394bf42c9ba49fdfcbb38cd2485150e2b738fbfcb01bb3&=&width=996&height=556"
-        ]
-    },
-    7: {  # Serious Series
-        "text": "Serious series… **SERIOUS PUNCH**",
-        "gifs": [
-            "https://media.discordapp.net/attachments/.../saitama-serious-vs.gif"
-        ]
-    },
-    10: {  # Rasengan
-        "text": "**RASENGAN!**",
-        "gifs": [
-            "https://media.discordapp.net/attachments/.../minato.gif"
-        ]
-    },
-    3: {  # Invincible Beatdown (just an example)
-        "text": "**INVINCIBLE BEATDOWN!**",
-        "gifs": [
-            "https://media.discordapp.net/attachments/.../invincible-punch-invincible.gif"
-        ]
-    },
-    # add more as you like…
-}
-
-
-
-
 # ─── Challenge UI ─────────────────────────────────────────────────────────────
 class ChallengeView(discord.ui.View):
     def __init__(self, session: Session, sessions: dict[int, Session]):
@@ -125,7 +89,7 @@ class ChallengeView(discord.ui.View):
     async def on_timeout(self):
         if not self.session.in_progress:
             await self.message.edit(
-                content="⏰ Challenge timed out—no one accepted!",
+                content="⏰ Challenge timed out. Looks like they ran away, haha!",
                 view=None
             )
             self.sessions.pop(self.session.channel.id, None)
@@ -229,6 +193,20 @@ class Battle(commands.Cog):
                 )
 
         # ── 2) INSTANT KILL ────────────────────────
+        elif atk.type is AttackType.INSTANT:
+            # zero out defender’s HP
+            defender.hp = 0
+            # announce the insta-kill
+            await ctx.send(f"💀 **{attacker.name}** lands **{atk.name}**! Instant KO!")
+            # (optional) send a matching GIF
+            # await asyncio.sleep(0.3)
+            # await ctx.send("https://…your-instant-kill.gif…")
+            # now end the duel
+            await ctx.send(f"🏆 **{attacker.name}** wins the duel!")
+            del self.sessions[ctx.channel.id]
+            return
+    
+        # ── 3) BACKFIRE ────────────────────────
         elif atk.type is AttackType.BACKFIRE:
             # mark attacker dead
             attacker.hp = 0
@@ -338,8 +316,82 @@ class Battle(commands.Cog):
             else:
                 # normal strike
                 defender.hp -= 25
+                attacker_player = attacker
+                defender_player = session.other(attacker_player)
+
+                # grab the underlying discord.Member
+                author = attacker_player.member
+                victim  = defender_player.member
+                if (atk.name == "Invincible Beatdown"):
+                    titlecard = random.randint(1,2)
+                    await ctx.send(f"Is this what you wanted, {victim.display_name}?")
+                    await asyncio.sleep(1)
+                    await ctx.send(f"You enjoy yourself?")
+                    await asyncio.sleep(1.5)
+                    await ctx.send(f"STILL HAVING FUN?")
+                    await asyncio.sleep(1.3)
+                    await ctx.send(f"**ANSWER ME!**")
+                    await asyncio.sleep(1.2)
+
+                    webhooks = await ctx.channel.webhooks()
+                    webhook = discord.utils.get(webhooks, name="Impersonator")
+                    if webhook is None:
+                        webhook = await ctx.channel.create_webhook(name="Impersonator")
+                        
+                    await webhook.send(
+                        content="I take the good with the bad.",
+                        username=author.display_name,
+                        avatar_url=author.display_avatar.url
+                    )
+                    await webhook.delete()
+                    
+                    await asyncio.sleep(1.5)
+                    await ctx.send("# **GRAAAAAAHHHHHH**")
+                    await asyncio.sleep(0.5)
+                    if titlecard == 1:
+                        await ctx.send("https://media.discordapp.net/attachments/1380198124081119435/1381656268032315533/invincible-punch-invincible.gif?ex=68484f2c&is=6846fdac&hm=7ffef3dccbe7001154d01007ad17cf29b1f245770091690f8c2e119a5c1be711&=&width=996&height=562")
+                    elif titlecard == 2:
+                        await ctx.send("https://preview.redd.it/characters-using-their-head-btw-congrats-to-the-sub-for-100k-v0-fvupe2avvgoe1.gif?width=640&crop=smart&auto=webp&s=0d80ce208df2ed15738d51a91211ac9e71b61894")
+                
+                elif (atk.name == "Black Flash"):
+                    blackflash = random.randint(1,6)
+                    await ctx.send(f"The sparks of black do not choose who to bless, {victim.display_name}.")
+                    await asyncio.sleep(1.2)
+                    await ctx.send(f"# **Black Flash**")
+                    await asyncio.sleep(0.5)
+                    if blackflash == 1:
+                        await ctx.send("https://cdn.discordapp.com/attachments/1380198124081119435/1381663696975298620/jjk-jjk-s2.gif?ex=68485617&is=68470497&hm=07986931101f68c41596588e08583f9a024d0231634c4f25a31b526cb8e7668f&")
+                    elif blackflash == 2:
+                        await ctx.send("https://cdn.discordapp.com/attachments/1380198124081119435/1381663697444802714/jujutsu-kaisen-jujutsu-kaisen-season-2.gif?ex=68485617&is=68470497&hm=0859c4581e7fd576a70763a3b129bb554934c07750128f5991b68ec554ed4644&")
+                    elif blackflash == 3:
+                        await ctx.send("https://media.discordapp.net/attachments/1380198124081119435/1381663697843392583/black-flash-jujutsu-kaisen.gif?ex=68485617&is=68470497&hm=67332fae0410cfd2a703abd0678425a7a308446e6ddfed0eaf7bbd0cd01eb6b0&=&width=1280&height=720")
+                    elif blackflash == 4:
+                        await ctx.send("https://media.discordapp.net/attachments/1380198124081119435/1381663698162286693/jjk-jujutsu-kaisen_1.gif?ex=68485617&is=68470497&hm=74fd2c54cb1c809dd96a0219205e9d81c35f07e4a9b2ffbc784162a3c76bb15a&=&width=996&height=562")
+                    elif blackflash == 5:
+                        await ctx.send("https://media.discordapp.net/attachments/1380198124081119435/1381663698682122512/jujutsu-kaisen-itadori-yuuji.gif?ex=68485617&is=68470497&hm=a3fc0b8ba474d780f59e7231347aed81855242d194ad1cb25ab690298b2b2b36&=&width=1280&height=852")
+                    elif blackflash == 6:
+                        await ctx.send("https://media.discordapp.net/attachments/1380198124081119435/1381663699139559555/itadori-yuji-kugisaki-nobara.gif?ex=68485617&is=68470497&hm=714b38297bd84bed95394bf42c9ba49fdfcbb38cd2485150e2b738fbfcb01bb3&=&width=996&height=556")
+                
+                elif (atk.name == "Serious Series"):
+                    series = random.randint(1,2)
+                    await ctx.send(f"Serious series...")
+                    await asyncio.sleep(1.2)
+                    if series == 1:
+                        await ctx.send(f"# **Serious Punch**")
+                        await asyncio.sleep(0.5)
+                        await ctx.send(f"https://media.discordapp.net/attachments/1380198124081119435/1381660383927992390/saitama-serious-vs.gif?ex=68485301&is=68470181&hm=5e56c4f90ffffc4a182aabae9c39fb123250654d031ada0d3dc0c5f238bf8b8a&=&width=996&height=562")
+                    elif series == 2:
+                        await ctx.send(f"# **Serious Tableflip**")
+                        await asyncio.sleep(0.5)
+                        await ctx.send(f"https://media.discordapp.net/attachments/1380198124081119435/1381660383462428863/saitama-serious-vs-cosmic-garou-serious-series.gif?ex=68485301&is=68470181&hm=c73130b3f9b7616ca568774fa489c15e88b893fb9d6874c6dffcad27fda6ce54&=&width=748&height=422")
+                
+                elif (atk.name == "Rasengan"):
+                    await ctx.send(f"# **Rasengan!**")
+                    await asyncio.sleep(0.5)
+                    await ctx.send("https://media.discordapp.net/attachments/1380198124081119435/1381658129766289539/minato.gif?ex=684850e8&is=6846ff68&hm=c29b72691cfe8e4914d105998b3dd1da8f22b80cbe5d14608949c15eadf5d0c0&=&width=996&height=592")
+                
                 await ctx.send(
-                    f"🔸 **{attacker.name}** uses **{atk.name}** strike! "
+                    f"🔸 **{attacker.name}** uses **{atk.name}**! "
                     f"{defender.name} loses 25 HP (now {defender.hp})."
                 )
 

@@ -25,27 +25,42 @@ async def ping(ctx):
 @ping.error
 async def pingError(ctx, error):
     if isinstance(error, commands.MissingRole):
-        await ctx.send("This command is admin only, stupid.")
+        await ctx.reply("This command is admin only, stupid.")
 
-@bot.command(name="memes-enable", help="Turn chat reactions ON")
+@bot.command(name="memes_enable", help="Turn chat reactions ON")
 @commands.has_role("Admin")
 async def memes_enable(ctx):
     global memes
     memes = True
     await ctx.reply("Chat reactions ENABLED 👍")
 
-@bot.command(name="memes-disable", help="Turn chat reactions OFF")
+@memes_enable.error
+async def memesEnableError(ctx, error):
+    if isinstance(error, commands.MissingRole):
+        await ctx.reply("This command is admin only, dumbass.")
+
+@bot.command(name="memes_disable", help="Turn chat reactions OFF")
 @commands.has_role("Admin")
 async def memes_disable(ctx):
     global memes
     memes = False
     await ctx.reply("Chat reactions DISABLED 👎")
 
+@memes_disable.error
+async def memesDisableError(ctx, error):
+    if isinstance(error, commands.MissingRole):
+        await ctx.reply("This command is admin only. If you try again I'm going to Final Flash your dumbass.")
+
 @bot.command(name="sick_em", help="Sick him, bot!")
 @commands.has_role("Admin")
 async def sick_him(ctx):
     await ctx.send("BARK BARK BARK")
     await ctx.send("https://tenor.com/view/girl-jumping-around-like-a-wolf-gif-26759976")
+    
+@sick_him.error
+async def sickEmError(ctx, error):
+    if isinstance(error, commands.MissingRole):
+        await ctx.reply("This command is admin only. Why? Because fuck you, that's why.")
 
 @bot.command(name="fuckem", help="Kills whomever you want")
 @commands.has_role("Admin")
@@ -276,6 +291,10 @@ async def fuck_em(ctx, member: commands.MemberConverter):
 
         await webhook.delete()
 
+@fuck_em.error
+async def fuckEmError(ctx, error):
+    if isinstance(error, commands.MissingRole):
+        await ctx.reply("This command is admin only. The fuck is wrong with you? ADMIN ONLY, BITCH.")
 
 @bot.event
 async def on_message(message):
