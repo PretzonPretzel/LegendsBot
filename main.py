@@ -18,27 +18,37 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 memes = False #CHANGE LATER TO TRUE TO ENABLE MEMES
 
 @bot.command(name="ping", help="Ping the bot, ensuring it's alive")
+@commands.has_role("Admin")
 async def ping(ctx):
     await ctx.reply("KAMEHAMEHA! Pong :3c")
 
+@ping.error
+async def pingError(ctx, error):
+    if isinstance(error, commands.MissingRole):
+        await ctx.send("This command is admin only, stupid.")
+
 @bot.command(name="memes-enable", help="Turn chat reactions ON")
+@commands.has_role("Admin")
 async def memes_enable(ctx):
     global memes
     memes = True
     await ctx.reply("Chat reactions ENABLED 👍")
 
 @bot.command(name="memes-disable", help="Turn chat reactions OFF")
+@commands.has_role("Admin")
 async def memes_disable(ctx):
     global memes
     memes = False
     await ctx.reply("Chat reactions DISABLED 👎")
 
 @bot.command(name="sick_em", help="Sick him, bot!")
+@commands.has_role("Admin")
 async def sick_him(ctx):
     await ctx.send("BARK BARK BARK")
     await ctx.send("https://tenor.com/view/girl-jumping-around-like-a-wolf-gif-26759976")
 
 @bot.command(name="fuckem", help="Kills whomever you want")
+@commands.has_role("Admin")
 async def fuck_em(ctx, member: commands.MemberConverter):
     attack = random.randint(1, 15)
     fucker = ctx.author.display_name
