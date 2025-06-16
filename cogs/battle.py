@@ -162,6 +162,10 @@ class Battle(commands.Cog):
 
         # 1) pick your attack
         attack_id = random.randint(1, 15)
+        
+        # Uncomment and change number to select attack and debug events
+        # attack_id = 1 
+        
         atk       = ALL_ATTACKS[attack_id]
         defender  = session.other(attacker)
 
@@ -173,8 +177,43 @@ class Battle(commands.Cog):
                 #   prev_player fired prev_atk, attacker just fired atk
                 winner = random.choice([prev_player, attacker])
                 loser  = session.other(winner)
+                clash = random.randint(1,2)
+                clash = 2 #DELETE AFTER
+                webhooks = await ctx.channel.webhooks()
+                webhook  = discord.utils.get(webhooks, name="Impersonator")
+                if webhook is None:
+                    webhook = await ctx.channel.create_webhook(name="Impersonator")
                 loser.hp -= 25
+                loser_member = loser.member
+                winner_member = winner.member
+                loser_atk = prev_atk if loser is prev_player else atk
+                if clash == 1:
+                    await ctx.send("https://tenor.com/view/dbz-dragon-ball-z-kakarot-goku-vegeta-gif-16782871")
+                    await asyncio.sleep(0.5)
+                    await webhook.send(
+                        content=f"IT'S HOPELESS, {winner.name.upper()}! THERE'S NO WAY YOU CAN STOP MY {loser_atk.name.upper()}!",
+                        username=loser_member.display_name,
+                        avatar_url=loser_member.display_avatar.url
+                    )
 
+                    await asyncio.sleep(1.8)
+                    await ctx.send("https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExNGVjNjl6NmdtMWVpdDBpMjkzeHM0NHZsOTFycHgxeDl5eTR1eWl2ciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/TBI6xlcO7y1jM1fgx0/giphy.gif")
+                    await asyncio.sleep(0.8)
+                    await webhook.send(
+                        content=f"GHHNNNNN. KAIOKEN...\n# **TIMES FOUR!!!**",
+                        username=winner_member.display_name,
+                        avatar_url=winner_member.display_avatar.url
+                    )
+                    await asyncio.sleep(2)
+                    await webhook.send(
+                        content=f"No!... They're beating me!...**GAHHHH**",
+                        username=loser_member.display_name,
+                        avatar_url=loser_member.display_avatar.url
+                    )
+                
+                elif clash == 2:
+                    
+                    
                 await ctx.send(
                     f"🔹 **{prev_player.name}** launched a **{prev_atk.name}**! \n"
                     f"🔹 **{attacker.name}** launches **{atk.name}**!\n"
@@ -183,6 +222,8 @@ class Battle(commands.Cog):
                 )
 
                 session.pending_beam = None
+                await webhook.delete()
+
 
             else:
                 # first beam of the duel
@@ -324,30 +365,50 @@ class Battle(commands.Cog):
                 victim  = defender_player.member
                 if (atk.name == "Invincible Beatdown"):
                     titlecard = random.randint(1,2)
-                    await ctx.send(f"Is this what you wanted, {victim.display_name}?")
-                    await asyncio.sleep(1)
-                    await ctx.send(f"You enjoy yourself?")
-                    await asyncio.sleep(1.5)
-                    await ctx.send(f"STILL HAVING FUN?")
-                    await asyncio.sleep(1.3)
-                    await ctx.send(f"**ANSWER ME!**")
-                    await asyncio.sleep(1.2)
-
                     webhooks = await ctx.channel.webhooks()
                     webhook = discord.utils.get(webhooks, name="Impersonator")
                     if webhook is None:
                         webhook = await ctx.channel.create_webhook(name="Impersonator")
                         
                     await webhook.send(
-                        content="I take the good with the bad.",
+                        content=f"Is this what you wanted, {victim.display_name}?",
                         username=author.display_name,
                         avatar_url=author.display_avatar.url
                     )
-                    await webhook.delete()
+                    await asyncio.sleep(1)
+                    await webhook.send(
+                        content=f"You enjoy yourself?",
+                        username=author.display_name,
+                        avatar_url=author.display_avatar.url
+                    )
+                    await asyncio.sleep(1.5)
+                    await webhook.send(
+                        content=f"STILL HAVING FUN?",
+                        username=author.display_name,
+                        avatar_url=author.display_avatar.url
+                    )
+                    await asyncio.sleep(1.3)
+                    await webhook.send(
+                        content=f"**ANSWER ME!**",
+                        username=author.display_name,
+                        avatar_url=author.display_avatar.url
+                    )
+                    await asyncio.sleep(1.2)
+                    await webhook.send(
+                        content="I take the good with the bad.",
+                        username=victim.display_name,
+                        avatar_url=victim.display_avatar.url
+                    )
+                    
                     
                     await asyncio.sleep(1.5)
-                    await ctx.send("# **GRAAAAAAHHHHHH**")
+                    await webhook.send(
+                        content=f"# **GRAAAAAAHHHHHH**",
+                        username=author.display_name,
+                        avatar_url=author.display_avatar.url
+                    )
                     await asyncio.sleep(0.5)
+                    await webhook.delete()
                     if titlecard == 1:
                         await ctx.send("https://media.discordapp.net/attachments/1380198124081119435/1381656268032315533/invincible-punch-invincible.gif?ex=68484f2c&is=6846fdac&hm=7ffef3dccbe7001154d01007ad17cf29b1f245770091690f8c2e119a5c1be711&=&width=996&height=562")
                     elif titlecard == 2:
