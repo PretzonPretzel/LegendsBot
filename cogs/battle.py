@@ -164,7 +164,7 @@ class Battle(commands.Cog):
         attack_id = random.randint(1, 15)
         
         # Uncomment and change number to select attack and debug events
-        # attack_id = 1 
+        #attack_id = 9
         
         atk       = ALL_ATTACKS[attack_id]
         defender  = session.other(attacker)
@@ -178,7 +178,10 @@ class Battle(commands.Cog):
                 winner = random.choice([prev_player, attacker])
                 loser  = session.other(winner)
                 clash = random.randint(1,2)
-                clash = 2 #DELETE AFTER
+                
+                # test specific clashes
+                #clash = 2
+                
                 webhooks = await ctx.channel.webhooks()
                 webhook  = discord.utils.get(webhooks, name="Impersonator")
                 if webhook is None:
@@ -193,7 +196,8 @@ class Battle(commands.Cog):
                     await webhook.send(
                         content=f"IT'S HOPELESS, {winner.name.upper()}! THERE'S NO WAY YOU CAN STOP MY {loser_atk.name.upper()}!",
                         username=loser_member.display_name,
-                        avatar_url=loser_member.display_avatar.url
+                        avatar_url=loser_member.display_avatar.url,
+                        wait = True
                     )
 
                     await asyncio.sleep(1.8)
@@ -202,17 +206,61 @@ class Battle(commands.Cog):
                     await webhook.send(
                         content=f"GHHNNNNN. KAIOKEN...\n# **TIMES FOUR!!!**",
                         username=winner_member.display_name,
-                        avatar_url=winner_member.display_avatar.url
+                        avatar_url=winner_member.display_avatar.url,
+                        wait = True
                     )
                     await asyncio.sleep(2)
                     await webhook.send(
                         content=f"No!... They're beating me!...**GAHHHH**",
                         username=loser_member.display_name,
-                        avatar_url=loser_member.display_avatar.url
+                        avatar_url=loser_member.display_avatar.url,
+                        wait = True
                     )
                 
                 elif clash == 2:
+                    await ctx.send("https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExdXVwcXZhNmlxYXRxYXllbzRrM21raXNsZnhnbXp4OTdibzEwbXkyZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/5ZyHBwztbHSk6q8BPb/giphy.gif")
+                    await asyncio.sleep(0.2)
+                    await webhook.send(
+                        content=f"**YOU AND THIS WHOLE PLANET ARE DONE FOR!**",
+                        username=loser_member.display_name,
+                        avatar_url=loser_member.display_avatar.url,
+                        wait = True
+                    )
+                    await asyncio.sleep(2)
+                    humans = [m for m in ctx.guild.members if not m.bot and m != ctx.author and m != loser_member]
+                    father = random.choice(humans)
+                    await webhook.send(
+                        content=f"Show him, {winner_member.display_name}....Let them see our combined power!",
+                        username=father.display_name,
+                        avatar_url=father.display_avatar.url,
+                        wait = True
+                    )
                     
+                    await asyncio.sleep(1)
+                    await webhook.send(
+                        content=f"**YOU'RE FINISHED!**",
+                        username=loser_member.display_name,
+                        avatar_url=loser_member.display_avatar.url,
+                        wait = True
+                    )
+                    
+                    await asyncio.sleep(1)
+                    await ctx.send("https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2RodG9pZmR2czRrbWRvNGtkb29odDh4YjZiY2EwZGxzeTl0azU5cSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/PUAvVpxS4x0nWDVFvj/giphy.gif")
+                    await webhook.send(
+                        content=f"# **HAAAAAAAAAAA!!!!**",
+                        username=winner_member.display_name,
+                        avatar_url=winner_member.display_avatar.url,
+                        wait = True
+                    )
+                    await asyncio.sleep(2)
+                    
+                    await ctx.send("https://i.ytimg.com/vi/lGU_lSpznUY/maxresdefault.jpg")
+                    await webhook.send(
+                        content=f"This...can't...be happening..!!!",
+                        username=loser_member.display_name,
+                        avatar_url=loser_member.display_avatar.url,
+                        wait = True
+                    )
                     
                 await ctx.send(
                     f"🔹 **{prev_player.name}** launched a **{prev_atk.name}**! \n"
@@ -238,11 +286,63 @@ class Battle(commands.Cog):
             # zero out defender’s HP
             defender.hp = 0
             # announce the insta-kill
+            webhooks = await ctx.channel.webhooks()
+            webhook  = discord.utils.get(webhooks, name="Impersonator")
+            if webhook is None:
+                webhook = await ctx.channel.create_webhook(name="Impersonator")
+            
+            attacker_player = attacker
+            defender_player = session.other(attacker_player)
+
+            author = attacker_player.member
+            victim  = defender_player.member
+            if atk.name == "Hakai":
+                gify = random.randint(1,2)
+                await webhook.send(
+                    content=f"Sorry, {victim.display_name}, but your luck has run out.",
+                    username=author.display_name,
+                    avatar_url=author.display_avatar.url,
+                    wait = True
+                )
+                await asyncio.sleep(1.7)
+                await webhook.send(
+                    content=f"# **Hakai.**",
+                    username=author.display_name,
+                    avatar_url=author.display_avatar.url,
+                    wait = True
+                )
+                await asyncio.sleep(0.5)
+                if gify == 1:
+                    await ctx.send("https://cdn.discordapp.com/attachments/1380198124081119435/1381659253332512908/voce-usou-hankai.gif?ex=684851f3&is=68470073&hm=5757914c5e4a196c8e62f52ee35a3581c199a90c0336cb7caa6b4f379bdb47ee&")
+                elif gify == 2:
+                    await ctx.send("https://media.discordapp.net/attachments/1380198124081119435/1381659252946370730/goku-manga-hakai-hakai.gif?ex=684851f3&is=68470073&hm=59775cb6f7cfa58d9bf579a77c2cdedea4f295007c71721d80c826f75e176a2c&=&width=996&height=560")
+            
+            elif atk.name == "Soul Punisher":
+                soulPunisher = random.randint(1,2)
+                humans = [m for m in ctx.guild.members if not m.bot and m != ctx.author and m != victim]
+                member1 = random.choice(humans)
+                member2 = random.choice(humans)
+                await webhook.send(
+                    content=f"I am not *{member1.display_name}* or *{member2.display_name}*! I am **{author.display_name}**! It's over {victim.display_name}, I've come for you!",
+                    username=author.display_name,
+                    avatar_url=author.display_avatar.url,
+                    wait = True
+                )
+                await asyncio.sleep(1.5)                
+                await webhook.send(
+                    content=f"Every force you create has an echo. Your own bad energy will be your undoing!",
+                    username=author.display_name,
+                    avatar_url=author.display_avatar.url,
+                    wait = True
+                )
+                await asyncio.sleep(0.5)
+                if soulPunisher == 1:
+                    await ctx.send(f"https://i.makeagif.com/media/4-15-2022/1oo8uC.gif")
+                elif soulPunisher == 2:
+                    await ctx.send(f"https://i.pinimg.com/originals/f0/b4/77/f0b477f65deb1fca584efdb5542e665b.gif")
+            
+            await asyncio.sleep(0.7)
             await ctx.send(f"💀 **{attacker.name}** lands **{atk.name}**! Instant KO!")
-            # (optional) send a matching GIF
-            # await asyncio.sleep(0.3)
-            # await ctx.send("https://…your-instant-kill.gif…")
-            # now end the duel
             await ctx.send(f"🏆 **{attacker.name}** wins the duel!")
             del self.sessions[ctx.channel.id]
             return
