@@ -69,6 +69,7 @@ ALL_ATTACKS = {
    13:  Attack(13, "Bat Whack",           AttackType.SPECIAL),
    14:  Attack(14, "Broly Backfire",      AttackType.BACKFIRE),
    15:  Attack(15, "Hollow Purple",       AttackType.BEAM),
+   16:  Attack(16, "Galick Gun",          AttackType.BEAM),
 }
 
 # sets for quick type checks
@@ -112,7 +113,7 @@ class ChallengeView(discord.ui.View):
     async def deny(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user != self.session.fucked.member:
             return await interaction.response.send_message("You can’t deny this!", ephemeral=True)
-        insults = ["You a bitch fr.", "Coward.", "Pathetic.", "Filthy monkey...can't even fight back.", "Are you trembling?", "Too much of a power gap, huh?", "What's wrong? Feeling chickenshit?", "Oh. Well, since they declined & i have your attention, did you know that The FitnessGram Pacer Test is a multistage aerobic capacity test that progressively gets more difficult as it continues. The 20 meter pacer test will begin in 30 seconds. Line up at the start. The running speed starts slowly but gets faster each minute after you hear this signal bodeboop. A sing lap should be completed every time you hear this sound. ding. Remember to run in a straight line and run as long as possible. The second time you fail to complete a lap before the sound, your test is over. The test will begin on the word start. On your mark. Get ready!… Start! ding"]
+        insults = ["Weak ass mf.", "You a bitch fr.", "Coward.", "Pathetic.", "Filthy monkey...can't even fight back.", "Are you trembling?", "Too much of a power gap, huh?", "What's wrong? Feeling chickenshit?", "Oh. Well, since they declined & i have your attention, did you know that The FitnessGram Pacer Test is a multistage aerobic capacity test that progressively gets more difficult as it continues. The 20 meter pacer test will begin in 30 seconds. Line up at the start. The running speed starts slowly but gets faster each minute after you hear this signal bodeboop. A sing lap should be completed every time you hear this sound. ding. Remember to run in a straight line and run as long as possible. The second time you fail to complete a lap before the sound, your test is over. The test will begin on the word start. On your mark. Get ready!… Start! ding"]
         await interaction.response.edit_message(
             content=f"{interaction.user.mention} denies the fight. {random.choice(insults)}",
             view=None
@@ -161,10 +162,13 @@ class Battle(commands.Cog):
             )
 
         # 1) pick your attack
-        attack_id = random.randint(1, 15)
+        attack_id = random.randint(1, 16)
         
         # Uncomment and change number to select attack and debug events
-        #attack_id = 9
+        #attack_id = 1
+        #options = [5, 10]
+        #attack_id = random.choice(options)
+        
         
         atk       = ALL_ATTACKS[attack_id]
         defender  = session.other(attacker)
@@ -416,6 +420,147 @@ class Battle(commands.Cog):
                 loser = session.other(beam_user)
                 loser.hp -= 25
 
+                webhooks = await ctx.channel.webhooks()
+                webhook  = discord.utils.get(webhooks, name="Impersonator")
+                if webhook is None:
+                    webhook = await ctx.channel.create_webhook(name="Impersonator")
+                attack_winner = beam_user.member
+                attack_loser = loser.member
+                
+                if beam_atk.name == "Kamehameha":
+                    await webhook.send(
+                        content=f"KAAAAMEEEEE",
+                        username=attack_winner.display_name,
+                        avatar_url=attack_winner.display_avatar.url,
+                        wait = True
+                    )
+                    await asyncio.sleep(0.9)
+                    await webhook.send(
+                        content=f"HAAAAMEEEEEE",
+                        username=attack_winner.display_name,
+                        avatar_url=attack_winner.display_avatar.url,
+                        wait = True
+                    )
+                    
+                    await asyncio.sleep(0.9)
+                    await webhook.send(
+                        content=f"# **HAAAAAAAAAAAAAA**",
+                        username=attack_winner.display_name,
+                        avatar_url=attack_winner.display_avatar.url,
+                        wait = True
+                    )
+                    
+                    await asyncio.sleep(0.5)
+                    await ctx.send("https://i.pinimg.com/originals/31/37/89/3137899f774569326119b5992d3a4409.gif")
+                    await asyncio.sleep(0.5)
+
+                elif beam_atk.name == "Final Flash":
+                    await webhook.send(
+                        content=f"YOU COCKY BASTARD. ARE YOU BRAVE ENOUGH TO TAKE THIS ONE, {attack_loser.display_name.upper()}?!",
+                        username=attack_winner.display_name,
+                        avatar_url=attack_winner.display_avatar.url,
+                        wait = True
+                    )
+                    await asyncio.sleep(1.2)
+                    await webhook.send(
+                        content=f"FINALLLLL",
+                        username=attack_winner.display_name,
+                        avatar_url=attack_winner.display_avatar.url,
+                        wait = True
+                    )
+                    await asyncio.sleep(0.9)
+                    await webhook.send(
+                        content=f"# **FLASHHHHHHH**",
+                        username=attack_winner.display_name,
+                        avatar_url=attack_winner.display_avatar.url,
+                        wait = True
+                    )
+                    await asyncio.sleep(0.5)
+                    vegetGif = random.randint(1,2)
+                    if vegetGif == 1:
+                        await ctx.send("https://i.pinimg.com/originals/89/fb/05/89fb055e736889c54778fa9348c2f0e6.gif")
+                    elif vegetGif == 2:
+                        await ctx.send("https://cdn.discordapp.com/attachments/1380198124081119435/1381662696625143919/0a12d9726479da1c6b3ab9ac9e4d044c.gif?ex=68485528&is=684703a8&hm=a84ed39da231d0ae3556ee20e0642f8d1c7b4f64dfdd15afa07e3951d9ebc24b&")
+
+                elif beam_atk.name == "Spirit Bomb":
+                    spiritbomb = random.randint(1,3)
+                    msg = await webhook.send(
+                        content="Everyone! I need you all to lend me your energy!",
+                        username=attack_winner.display_name,
+                        avatar_url=attack_winner.display_avatar.url,
+                        wait=True
+                    )
+                    gif = await webhook.send(
+                        content="https://media.tenor.com/8Ltt65SLeFUAAAAM/genki-dama-spirit-bomb.gif",
+                        username=attack_winner.display_name,
+                        avatar_url=attack_winner.display_avatar.url,
+                        wait=True
+                    )
+                    await asyncio.sleep(4)
+                    await msg.edit(content=f"IT'S READY!")
+                    await gif.edit(content="https://miro.medium.com/v2/resize:fit:884/1*ZTUASIVTMSDYY7K4ZSq98g.gif")
+                    await asyncio.sleep(3)
+                    await msg.edit(content=f"# **TAKE THIS!**")
+                    await asyncio.sleep(0.5)
+                    if spiritbomb == 1:
+                        await gif.edit(content="https://media.discordapp.net/attachments/1380198124081119435/1381660256123224124/goku.gif?ex=684852e3&is=68470163&hm=b15c1caed68b90669825aa83a92071fce206fdc0f8924598fd4fa918063cec8e&=&width=1280&height=720")
+                    elif spiritbomb == 2:
+                        await gif.edit(content="https://media.discordapp.net/attachments/1380198124081119435/1381660256827998208/dragon-ball-z-one-piece.gif?ex=684852e3&is=68470163&hm=e1e1167e26a19f4a337e4f038eaa5abb915ef1fd7c39b61bcf8aa9bdc04c58fd&=&width=748&height=422")
+                    elif spiritbomb == 3:
+                        await gif.edit(content="https://media.discordapp.net/attachments/1380198124081119435/1381660257230786711/goku-genkidama.gif?ex=684852e3&is=68470163&hm=91f1531f694f51aee054aed5592a263f68604bef666930af08ad9bb0596ccba6&=&width=746&height=562")
+
+                elif beam_atk.name == "Getsuga Tensho":
+                    await webhook.send(
+                        content="Getsuga....",
+                        username=attack_winner.display_name,
+                        avatar_url=attack_winner.display_avatar.url,
+                        wait=True
+                    )
+                    await asyncio.sleep(0.9)
+                    await webhook.send(
+                        content="# **Tensho!**",
+                        username=attack_winner.display_name,
+                        avatar_url=attack_winner.display_avatar.url,
+                        wait=True
+                    )
+                    await asyncio.sleep(0.5)
+                    await ctx.send("https://cdn.discordapp.com/attachments/1380198124081119435/1381659616487804988/ichigo-kurosaki-ichigo.gif?ex=6848524a&is=684700ca&hm=41538f4748df2d9b2188b9adaace917476e11f8e1fdbd18a887e55e5178a2b6e&")
+
+                elif beam_atk.name == "Hollow Purple":
+                    await webhook.send(
+                        content="Nine Ropes, Polarized Light, Crow and Declaration, Between Front and Back...",
+                        username=attack_winner.display_name,
+                        avatar_url=attack_winner.display_avatar.url,
+                        wait=True
+                    )
+                    await asyncio.sleep(0.9)
+                    await webhook.send(
+                        content="## **Hollow Purple**",
+                        username=attack_winner.display_name,
+                        avatar_url=attack_winner.display_avatar.url,
+                        wait=True
+                    )
+                    await asyncio.sleep(0.5)
+                    await ctx.send(f"https://media.discordapp.net/attachments/1380198124081119435/1381663464073728130/gojo-gojo-satoru.gif?ex=684855df&is=6847045f&hm=3954f92f96123a0ceeb8fb4d24b8a57906aa925ea4738f469d59760a530a2d3d&=&width=996&height=456")
+
+                elif beam_atk.name == "Galick Gun":
+                    await webhook.send(
+                        content=f"NOW, {attack_loser.display_name.upper()}, PREPARE YOURSELF FOR OBLIVION!",
+                        username=attack_winner.display_name,
+                        avatar_url=attack_winner.display_avatar.url,
+                        wait=True
+                    )
+                    await asyncio.sleep(0.9)
+                    await webhook.send(
+                        content=f"# **GALICK GUN!!**",
+                        username=attack_winner.display_name,
+                        avatar_url=attack_winner.display_avatar.url,
+                        wait=True
+                    )
+                    await asyncio.sleep(0.5)
+                    await ctx.send("https://i.namu.wiki/i/179VyMsH9ROjqh5liRq20bJ3VXFFb0CyGPGmxtfFrR3T6IpclPJX1QiahVN1bS11myTwJMsoo8NLnFb9pOqRZQ.gif")
+
+                
                 # mention both moves by name
                 await ctx.send(
                     f"🔹 **{beam_user.name}** launches **{beam_atk.name}** beam!\n"
@@ -426,6 +571,8 @@ class Battle(commands.Cog):
                 )
 
                 session.pending_beam = None
+                await webhook.delete()
+
 
             else:
                 # no beam pending, treat as normal special prompt
@@ -444,16 +591,157 @@ class Battle(commands.Cog):
                 loser = session.other(beam_user)
                 loser.hp -= 25
 
+                webhooks = await ctx.channel.webhooks()
+                webhook  = discord.utils.get(webhooks, name="Impersonator")
+                if webhook is None:
+                    webhook = await ctx.channel.create_webhook(name="Impersonator")
+                attack_winner = beam_user.member
+                attack_loser = loser.member
+                
+                if beam_atk.name == "Kamehameha":
+                    await webhook.send(
+                        content=f"KAAAAMEEEEE",
+                        username=attack_winner.display_name,
+                        avatar_url=attack_winner.display_avatar.url,
+                        wait = True
+                    )
+                    await asyncio.sleep(0.9)
+                    await webhook.send(
+                        content=f"HAAAAMEEEEEE",
+                        username=attack_winner.display_name,
+                        avatar_url=attack_winner.display_avatar.url,
+                        wait = True
+                    )
+                    
+                    await asyncio.sleep(0.9)
+                    await webhook.send(
+                        content=f"# **HAAAAAAAAAAAAAA**",
+                        username=attack_winner.display_name,
+                        avatar_url=attack_winner.display_avatar.url,
+                        wait = True
+                    )
+                    
+                    await asyncio.sleep(0.5)
+                    await ctx.send("https://i.pinimg.com/originals/31/37/89/3137899f774569326119b5992d3a4409.gif")
+                    await asyncio.sleep(0.5)
+
+                elif beam_atk.name == "Final Flash":
+                    await webhook.send(
+                        content=f"YOU COCKY BASTARD. ARE YOU BRAVE ENOUGH TO TAKE THIS ONE, {attack_loser.display_name.upper()}?!",
+                        username=attack_winner.display_name,
+                        avatar_url=attack_winner.display_avatar.url,
+                        wait = True
+                    )
+                    await asyncio.sleep(1.2)
+                    await webhook.send(
+                        content=f"FINALLLLL",
+                        username=attack_winner.display_name,
+                        avatar_url=attack_winner.display_avatar.url,
+                        wait = True
+                    )
+                    await asyncio.sleep(0.9)
+                    await webhook.send(
+                        content=f"# **FLASHHHHHHH**",
+                        username=attack_winner.display_name,
+                        avatar_url=attack_winner.display_avatar.url,
+                        wait = True
+                    )
+                    await asyncio.sleep(0.5)
+                    vegetGif = random.randint(1,2)
+                    if vegetGif == 1:
+                        await ctx.send("https://i.pinimg.com/originals/89/fb/05/89fb055e736889c54778fa9348c2f0e6.gif")
+                    elif vegetGif == 2:
+                        await ctx.send("https://cdn.discordapp.com/attachments/1380198124081119435/1381662696625143919/0a12d9726479da1c6b3ab9ac9e4d044c.gif?ex=68485528&is=684703a8&hm=a84ed39da231d0ae3556ee20e0642f8d1c7b4f64dfdd15afa07e3951d9ebc24b&")
+
+                elif beam_atk.name == "Spirit Bomb":
+                    spiritbomb = random.randint(1,3)
+                    msg = await webhook.send(
+                        content="Everyone! I need you all to lend me your energy!",
+                        username=attack_winner.display_name,
+                        avatar_url=attack_winner.display_avatar.url,
+                        wait=True
+                    )
+                    gif = await webhook.send(
+                        content="https://media.tenor.com/8Ltt65SLeFUAAAAM/genki-dama-spirit-bomb.gif",
+                        username=attack_winner.display_name,
+                        avatar_url=attack_winner.display_avatar.url,
+                        wait=True
+                    )
+                    await asyncio.sleep(4)
+                    await msg.edit(content=f"IT'S READY!")
+                    await gif.edit(content="https://miro.medium.com/v2/resize:fit:884/1*ZTUASIVTMSDYY7K4ZSq98g.gif")
+                    await asyncio.sleep(3)
+                    await msg.edit(content=f"# **TAKE THIS!**")
+                    await asyncio.sleep(0.5)
+                    if spiritbomb == 1:
+                        await gif.edit(content="https://media.discordapp.net/attachments/1380198124081119435/1381660256123224124/goku.gif?ex=684852e3&is=68470163&hm=b15c1caed68b90669825aa83a92071fce206fdc0f8924598fd4fa918063cec8e&=&width=1280&height=720")
+                    elif spiritbomb == 2:
+                        await gif.edit(content="https://media.discordapp.net/attachments/1380198124081119435/1381660256827998208/dragon-ball-z-one-piece.gif?ex=684852e3&is=68470163&hm=e1e1167e26a19f4a337e4f038eaa5abb915ef1fd7c39b61bcf8aa9bdc04c58fd&=&width=748&height=422")
+                    elif spiritbomb == 3:
+                        await gif.edit(content="https://media.discordapp.net/attachments/1380198124081119435/1381660257230786711/goku-genkidama.gif?ex=684852e3&is=68470163&hm=91f1531f694f51aee054aed5592a263f68604bef666930af08ad9bb0596ccba6&=&width=746&height=562")
+
+                elif beam_atk.name == "Getsuga Tensho":
+                    await webhook.send(
+                        content="Getsuga....",
+                        username=attack_winner.display_name,
+                        avatar_url=attack_winner.display_avatar.url,
+                        wait=True
+                    )
+                    await asyncio.sleep(0.9)
+                    await webhook.send(
+                        content="# **Tensho!**",
+                        username=attack_winner.display_name,
+                        avatar_url=attack_winner.display_avatar.url,
+                        wait=True
+                    )
+                    await asyncio.sleep(0.5)
+                    await ctx.send("https://cdn.discordapp.com/attachments/1380198124081119435/1381659616487804988/ichigo-kurosaki-ichigo.gif?ex=6848524a&is=684700ca&hm=41538f4748df2d9b2188b9adaace917476e11f8e1fdbd18a887e55e5178a2b6e&")
+
+                elif beam_atk.name == "Hollow Purple":
+                    await webhook.send(
+                        content="Nine Ropes, Polarized Light, Crow and Declaration, Between Front and Back...",
+                        username=attack_winner.display_name,
+                        avatar_url=attack_winner.display_avatar.url,
+                        wait=True
+                    )
+                    await asyncio.sleep(0.9)
+                    await webhook.send(
+                        content="## **Hollow Purple**",
+                        username=attack_winner.display_name,
+                        avatar_url=attack_winner.display_avatar.url,
+                        wait=True
+                    )
+                    await asyncio.sleep(0.5)
+                    await ctx.send(f"https://media.discordapp.net/attachments/1380198124081119435/1381663464073728130/gojo-gojo-satoru.gif?ex=684855df&is=6847045f&hm=3954f92f96123a0ceeb8fb4d24b8a57906aa925ea4738f469d59760a530a2d3d&=&width=996&height=456")
+
+                elif beam_atk.name == "Galick Gun":
+                    await webhook.send(
+                        content=f"NOW, {attack_loser.display_name.upper()}, PREPARE YOURSELF FOR OBLIVION!",
+                        username=attack_winner.display_name,
+                        avatar_url=attack_winner.display_avatar.url,
+                        wait=True
+                    )
+                    await asyncio.sleep(0.9)
+                    await webhook.send(
+                        content=f"# **GALICK GUN!!**",
+                        username=attack_winner.display_name,
+                        avatar_url=attack_winner.display_avatar.url,
+                        wait=True
+                    )
+                    await asyncio.sleep(0.5)
+                    await ctx.send("https://i.namu.wiki/i/179VyMsH9ROjqh5liRq20bJ3VXFFb0CyGPGmxtfFrR3T6IpclPJX1QiahVN1bS11myTwJMsoo8NLnFb9pOqRZQ.gif")
+                    
                 await ctx.send(
-                    f"🔹 **{beam_user.name}** launches **{beam_atk.name}** beam!\n"
-                    f"🔸 **{attacker.name}** attempts **{atk.name}** strike!\n"
+                    f"🔹 **{beam_user.name}** launches **{beam_atk.name}**!\n"
+                    f"🔸 **{attacker.name}** attempts **{atk.name}**!\n"
                     f"💥 **{beam_user.name}**’s **{beam_atk.name}** overwhelms "
                     f"{attacker.name}’s **{atk.name}**! "
                     f"{loser.name} loses 25 HP (now {loser.hp})."
                 )
 
                 session.pending_beam = None
-
+                await webhook.delete()
+                
             else:
                 # normal strike
                 defender.hp -= 25

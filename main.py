@@ -25,7 +25,7 @@ async def ping(ctx):
 @ping.error
 async def pingError(ctx, error):
     if isinstance(error, commands.MissingRole):
-        await ctx.reply("This command is admin only, stupid.")
+        await ctx.reply("This comm!and is admin only, stupid.")
 
 @bot.command(name="memes_enable", help="Turn chat reactions ON")
 @commands.has_role("Admin")
