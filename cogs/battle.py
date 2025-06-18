@@ -129,7 +129,7 @@ class Battle(commands.Cog):
     @commands.command(name="challenge", help="Invite someone to a 1v1 fight")
     async def challenge(self, ctx, opponent: discord.Member):
         if ctx.channel.id in self.sessions:
-            return await ctx.send("🚫 A battle is already in progress!")
+            return await ctx.send("🚫 A battle is already in progress! Fucking wait.")
         if opponent == ctx.author:
             return await ctx.send("You can’t battle yourself!")
 
@@ -149,10 +149,10 @@ class Battle(commands.Cog):
     async def roll(self, ctx):
         session = self.sessions.get(ctx.channel.id)
         if not session or not session.in_progress:
-            return await ctx.send("❓ No active fight to roll in.")
+            return await ctx.send("❓ Are you stupid? Start a fight to roll, fuckass.")
         attacker = session.turn
         if ctx.author != attacker.member:
-            return await ctx.send(f"⌛ Not your turn—it's {attacker.name}'s.")
+            return await ctx.send(f"⌛ Wait your fucking turn—it's {attacker.name}'s.")
         
         # **Prevent a new roll if you must stick/reroll a pending special**
         if session.pending_special:
@@ -374,13 +374,15 @@ class Battle(commands.Cog):
             await webhook.send(
                 content="Wha—What the?!",
                 username=author.display_name,
-                avatar_url=author.display_avatar.url
+                avatar_url=author.display_avatar.url,
+                wait = True
             )
             await asyncio.sleep(0.2)
             await webhook.send(
                 content="https://i.makeagif.com/media/1-28-2019/P8wA11.gif",
                 username=author.display_name,
-                avatar_url=author.display_avatar.url
+                avatar_url=author.display_avatar.url,
+                wait = True
             )
 
             # 2) Then have the victim taunt back
@@ -388,19 +390,22 @@ class Battle(commands.Cog):
             await webhook.send(
                 content=f"Now what was that supposed to be, {author.display_name}?",
                 username=victim.display_name,
-                avatar_url=victim.display_avatar.url
+                avatar_url=victim.display_avatar.url,
+                wait = True
             )
             await asyncio.sleep(0.9)
             await webhook.send(
                 content="https://media.discordapp.net/attachments/1380188830753362063/1381724686966198423/broly-goku.gif",
                 username=victim.display_name,
-                avatar_url=victim.display_avatar.url
+                avatar_url=victim.display_avatar.url,
+                wait = True
             )
             await asyncio.sleep(1.5)
             await webhook.send(
                 content="https://media.discordapp.net/attachments/1380188830753362063/1381724687528230972/broly-vs-goku-broly.gif",
                 username=victim.display_name,
-                avatar_url=victim.display_avatar.url
+                avatar_url=victim.display_avatar.url,
+                wait = True
             )
 
             # clean up
@@ -788,7 +793,6 @@ class Battle(commands.Cog):
                         avatar_url=victim.display_avatar.url
                     )
                     
-                    
                     await asyncio.sleep(1.5)
                     await webhook.send(
                         content=f"# **GRAAAAAAHHHHHH**",
@@ -860,22 +864,99 @@ class Battle(commands.Cog):
     async def stick(self, ctx):
         session = self.sessions.get(ctx.channel.id)
         if not session or not session.in_progress:
-            return await ctx.send("❓ No fight here.")
+            return await ctx.send("❓ There's no active fight? You tryna start one, fucker?")
         if not session.pending_special:
-            return await ctx.send("❓ You have no special to lock in.")
+            return await ctx.send("❓ You have no special to lock in, dumbfuck.")
         
         attacker, atk = session.pending_special
         if ctx.author != attacker.member:
-            return await ctx.send("🚫 That’s not your special to stick!")
+            return await ctx.send("🚫 That’s not your special to stick, you moron!")
 
         defender = session.other(attacker)
         defender.hp -= 25
+        
+        webhooks = await ctx.channel.webhooks()
+        webhook  = discord.utils.get(webhooks, name="Impersonator")
+        if webhook is None:
+            webhook = await ctx.channel.create_webhook(name="Impersonator")
+        attackie = attacker.member
+        atackee = defender.member
+        
+        if atk.name == "I Am Atomic":
+            await webhook.send(
+                content=f"I am...",
+                username=attackie.display_name,
+                avatar_url=attackie.display_avatar.url,
+                wait = True
+            )
+            await asyncio.sleep(1)
+            await webhook.send(
+                content=f"## **Atomic.**",
+                username=attackie.display_name,
+                avatar_url=attackie.display_avatar.url,
+                wait = True
+            )
+            await ctx.send(f"https://cdn.discordapp.com/attachments/1380198124081119435/1381662788023226418/forcegate1.gif?ex=6848553e&is=684703be&hm=b2a2ebbbcfdbab30d91edb9a4b47df8f2fd588f1508d34142db3844b1a08d816&")
+
+        elif atk.name == "Domain Expansion":
+            domain = random.randint(1,4)
+            await webhook.send(
+                content=f"Domain Expansion...",
+                username=attackie.display_name,
+                avatar_url=attackie.display_avatar.url,
+                wait = True
+            )
+            await asyncio.sleep(0.8)
+            if domain == 1:
+                await webhook.send(
+                    content=f"# **Infinite Void**",
+                    username=attackie.display_name,
+                    avatar_url=attackie.display_avatar.url,
+                    wait = True
+                )
+                await asyncio.sleep(0.5)
+                await ctx.send(f"https://cdn.discordapp.com/attachments/1380198124081119435/1381663168165838858/domain-expansion.gif?ex=68485599&is=68470419&hm=9a5b28490f449f395d46fc988a1f1ba5d8d20e642d620e31848bce28e8ef3689&")
+            elif domain == 2:
+                await webhook.send(
+                    content=f"# **Malevolent Shrine**",
+                    username=attackie.display_name,
+                    avatar_url=attackie.display_avatar.url,
+                    wait = True
+                )
+                await asyncio.sleep(0.5)
+                await ctx.send(f"https://media.discordapp.net/attachments/1380198124081119435/1381663168560107550/sukuna-mahoraga.gif?ex=68485599&is=68470419&hm=6d0e4649efaaf6a783d319132af132d27206989f53c127e53042b455f04ab2d2&=&width=996&height=446")
+            elif domain == 3:
+                await webhook.send(
+                    content=f"# **Self Embodiment of Perfection**",
+                    username=attackie.display_name,
+                    avatar_url=attackie.display_avatar.url,
+                    wait = True
+                )
+                await asyncio.sleep(0.5)
+                await ctx.send(f"https://media.discordapp.net/attachments/1380198124081119435/1381663169042186240/jjk-jujutsu-kaisen.gif?ex=68485599&is=68470419&hm=1214cafadc08226374d5ebfe470a36ec9e936285ab7d3738260ac3fe1b748bff&=&width=996&height=562")
+            elif domain == 4:
+                await webhook.send(
+                    content=f"# **Chimera Shadow Garden**",
+                    username=attackie.display_name,
+                    avatar_url=attackie.display_avatar.url,
+                    wait = True
+                )
+                await asyncio.sleep(0.5)
+                await ctx.send(f"https://media.discordapp.net/attachments/1380198124081119435/1381663169423999136/megumi-fushiguro-megumi-domain-expansion.gif?ex=68485599&is=68470419&hm=b5cec5b9949ecf3eb1d42e8a855740c6fb81ba53a5a7cc48089fb5bba271efe0&=&width=996&height=562")
+
+        elif atk.name == "Bat Whack":
+            await ctx.send(f"https://tenor.com/view/the-shusher-bat-staff-rod-gif-8855179341029231927")
+            asyncio.sleep(0.2)
+            await ctx.send("https://youtu.be/f8mL0_4GeV0?si=r5U5AsQ74Mv4M5ZK")
+        
         await ctx.send(
             f"✨ **{attacker.name}** locks in **{atk.name}**! "
             f"{defender.name} loses 25 HP (now {defender.hp})."
         )
 
         session.pending_special = None
+        await webhook.delete()
+
 
         if session.is_over():
             winner = session.winner()
@@ -910,7 +991,7 @@ class Battle(commands.Cog):
             return await ctx.send("❓ No fight to end here.")
         if ctx.author not in (session.fucker.member, session.fucked.member):
             return await ctx.send("🚫 You’re not in this fight!")
-        await ctx.send("🤝 The fight ends in a draw.")
+        await ctx.send(f"{ctx.author.display_name} ended the fight early. What a bitch.")
         del self.sessions[ctx.channel.id]
 
 async def setup(bot: commands.Bot):
