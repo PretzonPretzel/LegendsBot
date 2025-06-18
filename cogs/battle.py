@@ -303,7 +303,7 @@ class Battle(commands.Cog):
                 # first beam of the duel
                 session.pending_beam = (attacker, atk)
                 await ctx.send(
-                    f"🔹 **{attacker.name}** fires **{atk.name}** beam! "
+                    f"🔹 **{attacker.name}** fires **{atk.name}**! "
                     f"{defender.name}, roll to, hopefully, clash."
                 )
 
@@ -368,11 +368,11 @@ class Battle(commands.Cog):
                     await ctx.send(f"https://i.pinimg.com/originals/f0/b4/77/f0b477f65deb1fca584efdb5542e665b.gif")
             
             await asyncio.sleep(0.7)
-            self.record_win(winner.member)
+            self.record_win(attacker.member)
             await ctx.send(f"💀 **{attacker.name}** lands **{atk.name}**! Instant KO!")
             await ctx.send(
-                f"🏆 **{winner.name}** wins the duel! "
-                f"(They now have {self.wins[str(winner.member.id)]} total wins.)"
+                f"🏆 **{attacker.name}** wins the duel! "
+                f"(They now have {self.wins[str(attacker.member.id)]} total wins.)"
             )
             del self.sessions[ctx.channel.id]
             return
@@ -946,7 +946,6 @@ class Battle(commands.Cog):
         if webhook is None:
             webhook = await ctx.channel.create_webhook(name="Impersonator")
         attackie = attacker.member
-        atackee = defender.member
         
         if atk.name == "I Am Atomic":
             await webhook.send(

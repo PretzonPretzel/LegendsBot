@@ -342,7 +342,7 @@ async def on_message(message):
         await message.reply(file=discord.File("videos/If They Set That Android Free It Will Be The End Of All Of Us - Trunks Loses It - DBZ Dragon Ball Z - DBZMusicFanHD (360p, h264).mp4"))    
     
     if "future" in content:
-        await message.reply(file=discord.File("videos/＂THIS IS FOR GOHAN!＂ - LAiB_Gaming (1080p, h264) (online-video-cutter.com)(1).mp4"))
+        await message.reply(file=discord.File("videos/＂THIS IS FOR GOHA!N!＂ - LAiB_Gaming (1080p, h264) (online-video-cutter.com)(1).mp4"))
     
     # 7) "Piccolo" trigger
     if "win" in content:
