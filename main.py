@@ -347,7 +347,7 @@ async def on_message(message):
     # 7) "Piccolo" trigger
     if "win" in content:
         await message.reply("# **I CAN WIN. I FEEL GREAT. I. CAN. DO. THIS.**")
-        asyncio.sleep(1)
+        await asyncio.sleep(1)
         await message.reply(file=discord.File("videos/I FEEL GREAT. I CAN WIN. I. CAN. DO. THIS. - mattheavel (480p, h264) (online-video-cutter.com).mp4"))
     
 @bot.event

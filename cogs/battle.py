@@ -3,6 +3,21 @@ import random
 import discord
 from discord.ext import commands
 import asyncio
+import json
+import os
+
+# ─── Wins File ───────────────────────────────────────────────────────────────────
+WINS_FILE = "wins.json"
+
+def load_wins() -> dict[str, int]:
+    if os.path.exists(WINS_FILE):
+        with open(WINS_FILE, "r") as f:
+            return json.load(f)
+    return {}
+
+def save_wins(wins: dict[str, int]):
+    with open(WINS_FILE, "w") as f:
+        json.dump(wins, f)
 
 # ─── Player ───────────────────────────────────────────────────────────────────
 class Player:
@@ -126,6 +141,12 @@ class Battle(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.sessions: dict[int, Session] = {}
+        self.wins: dict[str, int] = load_wins()
+        
+    def record_win(self, user: discord.Member):
+        uid = str(user.id)
+        self.wins[uid] = self.wins.get(uid, 0) + 1
+        save_wins(self.wins)
 
     @commands.command(name="challenge", aliases=["c"], help="Invite someone to a 1v1 fight")
     async def challenge(self, ctx, opponent: discord.Member):
@@ -347,8 +368,12 @@ class Battle(commands.Cog):
                     await ctx.send(f"https://i.pinimg.com/originals/f0/b4/77/f0b477f65deb1fca584efdb5542e665b.gif")
             
             await asyncio.sleep(0.7)
+            self.record_win(winner.member)
             await ctx.send(f"💀 **{attacker.name}** lands **{atk.name}**! Instant KO!")
-            await ctx.send(f"🏆 **{attacker.name}** wins the duel!")
+            await ctx.send(
+                f"🏆 **{winner.name}** wins the duel! "
+                f"(They now have {self.wins[str(winner.member.id)]} total wins.)"
+            )
             del self.sessions[ctx.channel.id]
             return
     
@@ -889,7 +914,11 @@ class Battle(commands.Cog):
         # check for KO
         if session.is_over():
             winner = session.winner()
-            await ctx.send(f"🏆 **{winner.name}** wins the duel!")
+            self.record_win(winner.member)
+            await ctx.send(
+                f"🏆 **{winner.name}** wins the duel! "
+                f"(They now have {self.wins[str(winner.member.id)]} total wins.)"
+            )   
             del self.sessions[ctx.channel.id]
             return
 
@@ -997,7 +1026,11 @@ class Battle(commands.Cog):
 
         if session.is_over():
             winner = session.winner()
-            await ctx.send(f"🏆 **{winner.name}** wins the duel!")
+            self.record_win(winner.member)
+            await ctx.send(
+                f"🏆 **{winner.name}** wins the duel! "
+                f"(They now have {self.wins[str(winner.member.id)]} total wins.)"
+            )
             del self.sessions[ctx.channel.id]
             return
 
@@ -1030,6 +1063,33 @@ class Battle(commands.Cog):
             return await ctx.send("🚫 You’re not in this fight!")
         await ctx.send(f"{ctx.author.display_name} ended the fight early. What a bitch.")
         del self.sessions[ctx.channel.id]
+        
+    @commands.command(name="leaderboard", aliases=["lb"])
+    async def leaderboard(self, ctx):
+        """Show top win-counts."""
+        if not self.wins:
+            return await ctx.send("No victories have been recorded yet.")
+
+        # build a list of (member_id, wins) sorted descending
+        sorted_wins = sorted(
+            self.wins.items(),
+            key=lambda kv: kv[1],
+            reverse=True
+        )
+
+        # build an embed
+        embed = discord.Embed(
+            title="🏆 Battle Leaderboard",
+            color=discord.Color.gold()
+        )
+        description = ""
+        for i, (uid, count) in enumerate(sorted_wins[:10], start=1):
+            member = ctx.guild.get_member(int(uid))
+            name = member.display_name if member else f"<@{uid}>"
+            description += f"**{i}.** {name} — {count} wins\n"
+        embed.description = description
+
+        await ctx.send(embed=embed)
 
 async def setup(bot: commands.Bot):
     print("Loaded")
