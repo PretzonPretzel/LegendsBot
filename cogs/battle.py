@@ -104,7 +104,8 @@ class ChallengeView(discord.ui.View):
             content=(
                 f"⚔️ **Battle Start!**\n"
                 f"{self.session.fucker.name} vs {self.session.fucked.name}\n"
-                f"**{self.session.turn.name}** goes first—use `!roll`!"
+                f"**{self.session.turn.name}** goes first—use `!roll` or `!r`!\n\n"
+                f"-# You can use `!end` at any time to end the fight early. You aren't a bitch though, are you?"
             ),
             view=None
         )
@@ -126,7 +127,7 @@ class Battle(commands.Cog):
         self.bot = bot
         self.sessions: dict[int, Session] = {}
 
-    @commands.command(name="challenge", help="Invite someone to a 1v1 fight")
+    @commands.command(name="challenge", aliases=["c"], help="Invite someone to a 1v1 fight")
     async def challenge(self, ctx, opponent: discord.Member):
         if ctx.channel.id in self.sessions:
             return await ctx.send("🚫 A battle is already in progress! Fucking wait.")
@@ -145,7 +146,7 @@ class Battle(commands.Cog):
         )
         view.message = msg
 
-    @commands.command(name="roll", help="Roll your attack")
+    @commands.command(name="roll", aliases=["r"], help="Roll your attack")
     async def roll(self, ctx):
         session = self.sessions.get(ctx.channel.id)
         if not session or not session.in_progress:
@@ -158,7 +159,7 @@ class Battle(commands.Cog):
         if session.pending_special:
             return await ctx.send(
                 f"🌀 You rolled a special earlier! "
-                "Type `!stick` to lock it in or `!reroll` to roll again."
+                "Type `!stick` or `!s` to lock it in or `!reroll` to roll again."
             )
 
         # 1) pick your attack
@@ -555,7 +556,7 @@ class Battle(commands.Cog):
                         avatar_url=attack_winner.display_avatar.url,
                         wait=True
                     )
-                    await asyncio.sleep(0.9)
+                    await asyncio.sleep(1)
                     await webhook.send(
                         content=f"# **GALICK GUN!!**",
                         username=attack_winner.display_name,
@@ -568,8 +569,8 @@ class Battle(commands.Cog):
                 
                 # mention both moves by name
                 await ctx.send(
-                    f"🔹 **{beam_user.name}** launches **{beam_atk.name}** beam!\n"
-                    f"✨ **{attacker.name}** attempts **{atk.name}** special!\n"
+                    f"🔹 **{beam_user.name}** launches **{beam_atk.name}**!\n"
+                    f"✨ **{attacker.name}** attempts **{atk.name}**!\n"
                     f"💥 **{beam_user.name}**’s **{beam_atk.name}** overwhelms "
                     f"{attacker.name}’s **{atk.name}**! "
                     f"{loser.name} loses 25 HP (now {loser.hp})."
@@ -583,11 +584,11 @@ class Battle(commands.Cog):
                 # no beam pending, treat as normal special prompt
                 session.pending_special = (attacker, atk)
                 await ctx.send(
-                    f"✨ **{attacker.name}** rolls **{atk.name}** special!\n"
-                    "Type `!stick` to lock it in for 25 HP or `!reroll` to try again."
+                    f"✨ **{attacker.name}** rolls **{atk.name}**!\n"
+                    "Type `!stick` or `!s` to lock it in for 25 HP or `!reroll` to try again."
                 )
                 return
-
+            
         # 5) STRIKE (fallback for non‐beam, non‐instant, non‐backfire, non‐special)
         elif atk.type is AttackType.STRIKE:
             # beam beats strike
@@ -766,38 +767,44 @@ class Battle(commands.Cog):
                     await webhook.send(
                         content=f"Is this what you wanted, {victim.display_name}?",
                         username=author.display_name,
-                        avatar_url=author.display_avatar.url
+                        avatar_url=author.display_avatar.url,
+                        wait = True
                     )
                     await asyncio.sleep(1)
                     await webhook.send(
                         content=f"You enjoy yourself?",
                         username=author.display_name,
-                        avatar_url=author.display_avatar.url
+                        avatar_url=author.display_avatar.url,
+                        wait = True
                     )
                     await asyncio.sleep(1.5)
                     await webhook.send(
                         content=f"STILL HAVING FUN?",
                         username=author.display_name,
-                        avatar_url=author.display_avatar.url
+                        avatar_url=author.display_avatar.url,
+                        wait = True
                     )
                     await asyncio.sleep(1.3)
                     await webhook.send(
                         content=f"**ANSWER ME!**",
                         username=author.display_name,
-                        avatar_url=author.display_avatar.url
+                        avatar_url=author.display_avatar.url,
+                        wait = True
                     )
                     await asyncio.sleep(1.2)
                     await webhook.send(
                         content="I take the good with the bad.",
                         username=victim.display_name,
-                        avatar_url=victim.display_avatar.url
+                        avatar_url=victim.display_avatar.url,
+                        wait = True
                     )
                     
                     await asyncio.sleep(1.5)
                     await webhook.send(
                         content=f"# **GRAAAAAAHHHHHH**",
                         username=author.display_name,
-                        avatar_url=author.display_avatar.url
+                        avatar_url=author.display_avatar.url,
+                        wait = True
                     )
                     await asyncio.sleep(0.5)
                     await webhook.delete()
@@ -808,9 +815,19 @@ class Battle(commands.Cog):
                 
                 elif (atk.name == "Black Flash"):
                     blackflash = random.randint(1,6)
-                    await ctx.send(f"The sparks of black do not choose who to bless, {victim.display_name}.")
+                    await webhook.send(
+                        content=f"The sparks of black do not choose who to bless, {victim.display_name}.",
+                        username=author.display_name,
+                        avatar_url=author.display_avatar.url,
+                        wait = True
+                    )
                     await asyncio.sleep(1.2)
-                    await ctx.send(f"# **Black Flash**")
+                    await webhook.send(
+                        content=f"# **Black Flash**",
+                        username=author.display_name,
+                        avatar_url=author.display_avatar.url,
+                        wait = True
+                    )
                     await asyncio.sleep(0.5)
                     if blackflash == 1:
                         await ctx.send("https://cdn.discordapp.com/attachments/1380198124081119435/1381663696975298620/jjk-jjk-s2.gif?ex=68485617&is=68470497&hm=07986931101f68c41596588e08583f9a024d0231634c4f25a31b526cb8e7668f&")
@@ -827,19 +844,39 @@ class Battle(commands.Cog):
                 
                 elif (atk.name == "Serious Series"):
                     series = random.randint(1,2)
-                    await ctx.send(f"Serious series...")
+                    await webhook.send(
+                        content=f"Serious series...",
+                        username=author.display_name,
+                        avatar_url=author.display_avatar.url,
+                        wait = True
+                    )
                     await asyncio.sleep(1.2)
                     if series == 1:
-                        await ctx.send(f"# **Serious Punch**")
+                        await webhook.send(
+                            content=f"# **Serious Punch**",
+                            username=author.display_name,
+                            avatar_url=author.display_avatar.url,
+                            wait = True
+                        )
                         await asyncio.sleep(0.5)
                         await ctx.send(f"https://media.discordapp.net/attachments/1380198124081119435/1381660383927992390/saitama-serious-vs.gif?ex=68485301&is=68470181&hm=5e56c4f90ffffc4a182aabae9c39fb123250654d031ada0d3dc0c5f238bf8b8a&=&width=996&height=562")
                     elif series == 2:
-                        await ctx.send(f"# **Serious Tableflip**")
+                        await webhook.send(
+                            content=f"# **Serious Tableflip**",
+                            username=author.display_name,
+                            avatar_url=author.display_avatar.url,
+                            wait = True
+                        )
                         await asyncio.sleep(0.5)
                         await ctx.send(f"https://media.discordapp.net/attachments/1380198124081119435/1381660383462428863/saitama-serious-vs-cosmic-garou-serious-series.gif?ex=68485301&is=68470181&hm=c73130b3f9b7616ca568774fa489c15e88b893fb9d6874c6dffcad27fda6ce54&=&width=748&height=422")
                 
                 elif (atk.name == "Rasengan"):
-                    await ctx.send(f"# **Rasengan!**")
+                    await webhook.send(
+                            content=f"# **Rasengan!**",
+                            username=author.display_name,
+                            avatar_url=author.display_avatar.url,
+                            wait = True
+                        )
                     await asyncio.sleep(0.5)
                     await ctx.send("https://media.discordapp.net/attachments/1380198124081119435/1381658129766289539/minato.gif?ex=684850e8&is=6846ff68&hm=c29b72691cfe8e4914d105998b3dd1da8f22b80cbe5d14608949c15eadf5d0c0&=&width=996&height=592")
                 
@@ -858,9 +895,9 @@ class Battle(commands.Cog):
 
         # swap turns
         session.turn = defender
-        await ctx.send(f"🔄 Next: **{session.turn.name}** – type `!roll` or `!end`.")
+        await ctx.send(f"🔄 Next: **{session.turn.name}** – type `!roll` or `!r`!")
 
-    @commands.command(name="stick", help="Lock in your special for 25 HP")
+    @commands.command(name="stick", aliases=["s"], help="Lock in your special for 25 HP")
     async def stick(self, ctx):
         session = self.sessions.get(ctx.channel.id)
         if not session or not session.in_progress:
@@ -946,7 +983,7 @@ class Battle(commands.Cog):
 
         elif atk.name == "Bat Whack":
             await ctx.send(f"https://tenor.com/view/the-shusher-bat-staff-rod-gif-8855179341029231927")
-            asyncio.sleep(0.2)
+            await asyncio.sleep(0.2)
             await ctx.send("https://youtu.be/f8mL0_4GeV0?si=r5U5AsQ74Mv4M5ZK")
         
         await ctx.send(
@@ -965,7 +1002,7 @@ class Battle(commands.Cog):
             return
 
         session.turn = defender
-        await ctx.send(f"🔄 Next: **{session.turn.name}** – type `!roll` or `!end`.")
+        await ctx.send(f"🔄 Next: **{session.turn.name}** – type `!roll` or `!r`!")
 
     @commands.command(name="reroll", help="Roll again for a different attack")
     async def reroll(self, ctx):
