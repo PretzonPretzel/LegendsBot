@@ -18,17 +18,17 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 memes = False #CHANGE LATER TO TRUE TO ENABLE MEMES
 
 @bot.command(name="ping", help="Ping the bot, ensuring it's alive")
-@commands.has_role("Admin")
+@commands.has_role("Derpy Memers")
 async def ping(ctx):
     await ctx.reply("KAMEHAMEHA! Pong :3c")
 
 @ping.error
 async def pingError(ctx, error):
     if isinstance(error, commands.MissingRole):
-        await ctx.reply("This comm!and is admin only, stupid.")
+        await ctx.reply("This command is admin only, stupid.")
 
 @bot.command(name="memes_enable", help="Turn chat reactions ON")
-@commands.has_role("Admin")
+@commands.has_role("Derpy Memers")
 async def memes_enable(ctx):
     global memes
     memes = True
@@ -40,7 +40,7 @@ async def memesEnableError(ctx, error):
         await ctx.reply("This command is admin only, dumbass.")
 
 @bot.command(name="memes_disable", help="Turn chat reactions OFF")
-@commands.has_role("Admin")
+@commands.has_role("Derpy Memers")
 async def memes_disable(ctx):
     global memes
     memes = False
@@ -52,7 +52,7 @@ async def memesDisableError(ctx, error):
         await ctx.reply("This command is admin only. If you try again I'm going to Final Flash your dumbass.")
 
 @bot.command(name="sick_em", help="Sick him, bot!")
-@commands.has_role("Admin")
+@commands.has_role("Derpy Memers")
 async def sick_him(ctx):
     await ctx.send("BARK BARK BARK")
     await ctx.send("https://tenor.com/view/girl-jumping-around-like-a-wolf-gif-26759976")
@@ -63,7 +63,7 @@ async def sickEmError(ctx, error):
         await ctx.reply("This command is admin only. Why? Because fuck you, that's why.")
 
 @bot.command(name="fuckem", help="Kills whomever you want")
-@commands.has_role("Admin")
+@commands.has_role("Derpy Memers")
 async def fuck_em(ctx, member: commands.MemberConverter):
     attack = random.randint(1, 15)
     fucker = ctx.author.display_name
@@ -342,7 +342,7 @@ async def on_message(message):
         await message.reply(file=discord.File("videos/If They Set That Android Free It Will Be The End Of All Of Us - Trunks Loses It - DBZ Dragon Ball Z - DBZMusicFanHD (360p, h264).mp4"))    
     
     if "future" in content:
-        await message.reply(file=discord.File("videos/＂THIS IS FOR GOHA!N!＂ - LAiB_Gaming (1080p, h264) (online-video-cutter.com)(1).mp4"))
+        await message.reply(file=discord.File("videos/＂THIS IS FOR GOHAN!＂ - LAiB_Gaming (1080p, h264) (online-video-cutter.com)(1).mp4"))
     
     # 7) "Piccolo" trigger
     if "win" in content:
